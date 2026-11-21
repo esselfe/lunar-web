@@ -3,7 +3,7 @@ title: "Frequently Asked Questions"
 description: "Common questions and answers about Lunar Linux, installation, optimization, and package management"
 category: "general"
 tags: ["faq", "help", "troubleshooting", "guide"]
-lastUpdated: 2025-11-02
+lastUpdated: 2026-11-21
 order: 1
 ---
 
@@ -17,21 +17,17 @@ Please read the [About Lunar Linux](/about) page.
 
 ### Can I run Lunar Linux in 64-bit mode?
 
-Yes you can. You can run Lunar Linux in either 64-bit or 32-bit mode, but there is no multi-lib mode. Be aware that some applications are still only available for 32-bit mode!
+Yes you can. You can run Lunar Linux in either 64-bit or 32-bit mode, but there is no multi-lib toolchain. Be aware that some applications are still only available for 32-bit mode, such as older Windows games requiring the wine32 program (currently unavailable on 64-bit systems).
 
 ### Where can I find how to...?
 
 The Lunar documentation only offers details specific to Lunar Linux. Many other resources already exist for general Linux problem solving.
 
 For example, information on how to customize the Linux kernel can be found at:
-- [http://kernelnewbies.org/](http://kernelnewbies.org/)
-- [http://en.wikipedia.org/wiki/Linux_kernel_mailing_list](http://en.wikipedia.org/wiki/Linux_kernel_mailing_list)
+- [https://kernelnewbies.org/](https://kernelnewbies.org/)
+- [https://en.wikipedia.org/wiki/Linux_kernel_mailing_list](https://en.wikipedia.org/wiki/Linux_kernel_mailing_list)
 
 ## Lunar Linux Installation
-
-### My USB keyboard is not recognized
-
-At the boot prompt type `linux uhci-hcd ehci-hcd` to make sure those modules are loaded during startup. These will enable your USB keyboard.
 
 ### So how should I partition my disk?
 
@@ -44,7 +40,7 @@ Desktops commonly have one hard disk. You don't want to reformat or repartition 
 1. **Root filesystem** - Big enough for all Lunar software (4-12 GB based on applications installed)
 2. **Home partition** - The rest of the disk for `/home`
 
-Typically, Lunar occupies between 4 and 12 GB based on how many applications you install. If you clean up often you can manage with 8GB, but you should keep some extra space.
+Typically, Lunar occupies between 8 and 32 GB based on how many applications you install. If you clean up often you can manage with 8GB, but you should keep some extra space.
 
 **Swap recommendation:** Use a swapfile instead of a swap partition. You can always later delete the swap, or move the swapfile to another disk or partition. A swap partition is harder to relocate.
 
@@ -76,19 +72,29 @@ Another consideration is that not everything works perfectly, and some features 
 A very simple way to test a Lunar ISO for booting purposes is:
 
 ```bash
-qemu -cdrom lunar-1.5.0-i686.iso -boot d
+qemu -cdrom lunar-1.8.0-daily-[YYYYMMDD]-x86_64.iso -boot d
 ```
 
-If you want to test a full install, create a 512 megabyte sparse root_fs image:
+If you want to test a full install, create a 20 gigabyte QCOW2 disk image used as rootfs:
 
 ```bash
-dd if=/dev/zero of=hda.img bs=$((1024 * 1024)) count=0 seek=512
+qemu-img create -f qcow2 Lunar.qcow2 20G
 ```
 
-Now invoke qemu:
+Now invoke qemu for the installation:
 
 ```bash
-qemu -cdrom lunar-1.5.0-i686.iso -boot d -hda hda.img
+qemu-system-x86_64 -vga std -enable-kvm -m 2048 -cpu 2 \
+  -drive file=Lunar.qcow2,format=qcow2,if=virtio \
+  -cdrom file=lunar-1.8.0-daily-[YYYYMMDD]-x86_64.iso,if=virtio \
+  -boot d
+```
+
+After powering off the VM, run qemu with the new system:
+
+```bash
+qemu-system-x86_64 -vga std -enable-kvm -m 2048 -cpu 2 -nic user \
+  -drive file=Lunar.qcow2,format=qcow2,if=virtio
 ```
 
 You can then proceed to test your Lunar install. QEMU can also be quite easily used to test if your brand new kernel is bootable or not, which is quite neat.
@@ -109,14 +115,15 @@ The default sure-fire optimizations that are recommended are:
 - `-pipe`
 
 **CPU Architecture:**
-- You should pick the correct architecture for your own system (defaults to x86 for most people)
+- You should pick the correct architecture for your own system (defaults to x86-64 for most people)
 
 **Basic Optimizations:**
 - Faster (`-O2`, the default)
 
 **CPU:**
 - This should be set to your own CPU, or the CPU of the machine you plan to run this install on
-- If you want to run this install on many machines, you should be safe with I686
+- The "native" option turns on all the CPU features in addition to the default generic x86-64 target, such as SSE2, SSSE3, SSE4_\*, SIMD, AVX, etc.
+- If you want to run this install on many machines, you should be safe with x86-64
 
 **Speed Optimizations:**
 - If you want to be 100% sure that there won't be optimization problems, you shouldn't select any of these
@@ -125,13 +132,13 @@ The default sure-fire optimizations that are recommended are:
 - Not recommended to use any of these optimizations, even for modules known to be able to handle them, since they cause many apps to break
 
 **Floating Point Math:**
-- None. If your architecture is x86 and you don't own a 386SX or 486SX, it's safe to select x387
+- None
 
 **Linker Options:**
-- Strip
+- Strip (Turn this off if you want debug symbols with a problematic module)
 
 **Addon Program Support:**
-- CCache (make sure to install it first)
+- CCache
 
 These settings should work for almost everyone, and there is room for pushing these optimizations more, at the risk of problems with some applications. Read `info gcc` and make sure you understand a given optimization before you enable it.
 
@@ -154,7 +161,7 @@ Start with the basic optimizations and change the Basic Optimizations to Faster 
 
 Then select the CPU you will run it on. Some speed optimizations that should be decent and shouldn't cause too many problems: `-fomit-frame-pointer`
 
-A safe bet for floating point math on x86 would be x387, if you know your CPU has a floating point unit. Check `cat /proc/cpuinfo` to see if your CPU supports SSE or SSE2. If your CPU does have SSE or SSE2, you can also add that to the math optimizations.
+Check `cat /proc/cpuinfo` to see if your CPU supports SSE or SSE2. If your CPU does have SSE or SSE2, you can also add that to the math optimizations.
 
 Your results may vary. Read `info gcc` and make sure you understand a given optimization before you enable it.
 
@@ -191,16 +198,16 @@ There are three possible reasons why the download failed:
 **3. Version has been removed:**
 - You are trying to download a version that has been removed because a newer version exists
 - Browse the module's website to discover the new version number
-- Run `lvu edit` to create a zlocal copy, and edit that copy with the new location, version number, sha1sum, etc.
+- Run `lvu edit` to create a zlocal copy, and edit that copy with the new location, version number, sha256sum, etc.
 - Note: You could first try to run `lin -w newVersion` and hope that it builds without problems
 
-If you do create your own zlocal copy, please consider submitting it using `lvu submit`. (See [Module Submission](/docs/development/module-submission))
+If you do create your own zlocal copy, please consider submitting it on Github as a new pull request (PR). (See [Module Submission](/docs/development/module-submission))
 
 ### error: C compiler cannot create executables
 
 What does this error mean and how can I fix it?
 
-This is basically the same problem as the C preprocessor error below: There are kernel headers missing that are vital to compilation. You will have to restore them. See the next topic for how to do that.
+This is basically the same problem as the C preprocessor error below: There are libraries missing that are vital to the compilation. You will have to restore them. See the next topic for how to do that.
 
 ### configure: error: C preprocessor "/lib/cpp" fails sanity check
 
@@ -211,10 +218,8 @@ Your kernel headers are missing from `/usr/include`. This means the C PreProcess
 **Try this first:**
 
 ```bash
-lin kernel-headers-2.4
+lin kernel-headers
 ```
-
-(Use the 2.6 version if needed)
 
 **If that doesn't work:**
 
@@ -244,20 +249,6 @@ Last, you can always try to unpack the kernel tarball you have into `/usr/src/li
 ### Can I add more window managers to gdm?
 
 Copy the desktop startup files to `/etc/X11/dm/Sessions/`. That works with gdm. For kdm you will have to copy them to `$KDE_PREFIX/share/apps/kdm/sessions`.
-
-### How do I get Flash to work in Mozilla or Firefox?
-
-If you are using Mozilla or Firefox, you can simply do a `lin flash-plugin` and that will download and install the Macromedia Flash plugin that works with a gtk+ based Mozilla through the old ABI wrappers.
-
-The Flash plugin does not work with Galeon. The Galeon developers have declined to provide the "old" ABI wrappers needed for the plugin to work.
-
-### How do I install Java?
-
-You will have to download the Java source code from Sun yourself and you have to "click" to agree to their license. You have to compile it yourself too. We don't have a Sun Java module as we currently have no way to automate the "click" to agree to the Sun Java license.
-
-The "Java from scratch" hint from Linux From Scratch used to have some handy info on this (the original link is no longer available).
-
-There is a j2sdk module in moonbase which is the Blackdown port of Sun's Java Virtual Machine.
 
 ## Removing Modules
 
@@ -378,7 +369,7 @@ The module is coded in a set of files in a directory structure, and scripted in 
 
 ### What is the Moonbase?
 
-The Moonbase is a database with modules. In this database there are descriptions of packages that tell the core tools where to download, how to compile, and how to install a module. You can consider this the Lunar equivalent of portage, grimoire, ports, etc.
+The Moonbase is a filesystem-based database with modules. In this database there are descriptions of packages that tell the core tools where to download, how to compile, and how to install a module. You can consider this the Lunar equivalent of portage, grimoire, ports, etc.
 
 See [Moonbase](/docs/package-management/moonbase) for more details.
 
@@ -386,7 +377,9 @@ See [Moonbase](/docs/package-management/moonbase) for more details.
 
 theedge is the same as lunar, and is also known as the core code. theedge is just another version of lunar. These two pieces of code install your packages, but they do not contain package descriptions. Those are defined in moonbase.
 
-theedge is a development version of lunar. Often there are many more features in theedge, and bugs are fixed quicker as well. However, if you do not like all this tweaking on your system, we advise you to use the stable lunar core tools instead.
+Note that thedge is not used anymore, as of november 2026.
+
+theedge was a development version of lunar. Often there were many more features in theedge, and bugs were fixed quicker as well. However, if you do not like all this tweaking on your system, we advise you to use the stable lunar core tools instead.
 
 You can install theedge by issuing:
 
@@ -414,8 +407,6 @@ cpio -i -d < XYZ.cpio
 
 If you are trying to rpmunpack a source RPM (i.e., .src.rpm) file, then XYZ.cpio may further contain a tar.bz2 or tar.gz source tarball.
 
-In the zbeta section of moonbase, there is an unsupported module called `rpm` for those of you that are really desperate.
-
 You might want to do `man cpio` to check out additional cpio parameters that may interest you, such as the `-L` switch.
 
 ### What is that in the Lunar Linux logo?
@@ -424,4 +415,6 @@ The logo is a [Rockhopper Penguin](http://en.wikipedia.org/wiki/Southern_Rockhop
 
 You can check out [Google Images](http://images.google.com/images?q=Rockhopper+Penguin) for lots of Rockhopper Penguin pictures!
 
-The current logo has been designed by Michael Schindler in 2003 and appeared as the official logo of the Lunar Linux project in 2004.
+The previous logo was designed by Michael Schindler in 2003 and appeared as the official logo of the Lunar Linux project in 2004-2024.
+
+The current logo was designed by tbeckerson in 2022 and appears as the current logo mostly everywhere except distrowatch.com.
