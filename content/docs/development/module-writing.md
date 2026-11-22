@@ -99,9 +99,18 @@ What to notice:
 
 Every field is described under [The DETAILS File](/docs/development/module-basics#the-details-file). DETAILS is bash, sourced by Lunar, so quote anything with spaces and use `cat << 'EOF'` if the description contains `` ` `` or `$`.
 
-## 3. Get the Checksum
+## 3. Check the Source and Get the Checksum
 
-Download the source with `lget`, then compute the checksum of the file you got:
+`SOURCE_VFY` pins the module to one exact file. Everyone who builds the module downloads the source themselves, from the URL in DETAILS or a mirror, and `lin` refuses to build it unless the checksum matches. If the file is later swapped on the server, corrupted on a mirror or changed on the way, the build stops instead of installing something nobody has checked.
+
+That protection is only as good as the file you made the checksum from. If you compute it from a download that was already tampered with, the module pins the tampered file and every user installs it. So before you compute the checksum, make sure the file is the one upstream released. That is your job as the module's author; Lunar can't do it for you.
+
+- **Download from the project's own site or repository, over https.** Take the URL from the project's website, not from a search result or a third-party mirror list.
+- **Compare with upstream's checksum** when the project publishes one, on its release page or in a `SHA256SUMS` file.
+- **Verify the signature** when the project signs its releases (a `.sig` or `.asc` file next to the tarball), with the project's key from its website or earlier releases: `gpg --verify foo-1.2.tar.xz.sig foo-1.2.tar.xz`.
+- **When upstream publishes neither**, at least check that the version is a real release or tag in the upstream repository, and that the tarball's contents match it.
+
+pamixer publishes neither, so the file to trust is GitHub's archive of the `1.6` tag in the project's own repository. Download it with `lget`, then compute the checksum:
 
 ```bash
 lget pamixer
@@ -114,7 +123,7 @@ Put it in DETAILS with a `sha256:` prefix:
       SOURCE_VFY=sha256:8b7199e495dc19b190f8f02ace8782f533266a4bd7c7d3cf6f4cf09b2de13e71
 ```
 
-Never copy a checksum from somewhere else, and don't leave the prefix out or misspell it. See [Checksums](/docs/development/module-basics#checksums).
+Don't leave the prefix out or misspell it: Lunar checks `sha256:`, `sha1:` and `md5:` and quietly skips anything else, so a typo means the file is never checked. See [Checksums](/docs/development/module-basics#checksums).
 
 ## 4. Lint It
 
@@ -252,7 +261,7 @@ Run `llint pamixer` once more after your last change.
 
 ## Common Mistakes
 
-- **Checksum mismatch.** The file in `/var/spool/lunar` isn't the one the checksum was made from. When a download stops matching without a new version, find out why before you change `SOURCE_VFY`: some sites regenerate their archive downloads, but a changed file can also have been tampered with.
+- **Checksum mismatch.** The file in `/var/spool/lunar` isn't the one the checksum was made from. When a download stops matching without a new version, find out why before you change `SOURCE_VFY`: some sites regenerate their archive downloads, but a changed file can also have been tampered with. Check the new file against upstream as in step 3 before you trust it.
 - **A dependency your machine happens to have.** See `lvu links` above. Read the build files rather than trusting that it built.
 - **Changing `UPDATED` for a cosmetic change.** `UPDATED` tells users to rebuild. Change it for a new version or anything that changes the build, not for tidying the file.
 - **Doing too much in POST_INSTALL.** Users and groups belong in `sysusers.d`, services in `systemd.d`, and rebuilding another module after this one in a [CATALYST](/docs/development/module-basics#the-catalyst-file) file. See [Module Directories](/docs/development/module-basics#module-directories).

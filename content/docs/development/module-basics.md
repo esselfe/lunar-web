@@ -118,13 +118,17 @@ Users can point these at a mirror close to them, which makes downloads faster an
 
 #### Checksums
 
-`SOURCE_VFY` checks that the downloaded file is the one the module was written for, and hasn't been corrupted or changed since:
+`SOURCE_VFY` pins the module to one exact file. `lin` won't build a download whose checksum doesn't match, so a file that was swapped on the server, corrupted on a mirror or changed on the way is stopped before it is installed:
 
 ```bash
 SOURCE_VFY=sha256:01a7b881bd220bfdf615f97b8718f80bdfd3f6add385b993dcf6efd14e8c0ac6
 ```
 
-Use `sha256:` for new modules. Lunar also checks `sha1:` and `md5:`, which older modules still use. Compute the checksum from the file you actually downloaded (`sha256sum file`), never copy it from somewhere else. Leave `SOURCE_VFY` out only for modules that download a snapshot from a git or other repository, where the source changes between downloads.
+Use `sha256:` for new modules. Lunar also checks `sha1:` and `md5:`, which older modules still use; any other prefix, or a misspelled one, means the file isn't checked at all.
+
+The checksum only protects users if the file it was made from is genuine: computed from a tampered download, it makes every user install the tampered file. Before computing it, make sure the file is the one upstream released. Download it over https from the project's own site, compare it with the checksum upstream publishes, and verify upstream's signature if the project signs its releases. Then compute the checksum from that file (`sha256sum file`). [Writing Modules](/docs/development/module-writing#_3-check-the-source-and-get-the-checksum) has the steps.
+
+Leave `SOURCE_VFY` out only for modules that download a snapshot from a git or other repository, where the source changes between downloads.
 
 #### Optional DETAILS Fields
 

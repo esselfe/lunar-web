@@ -105,15 +105,21 @@ Or manually change into the directory given by `lvu edit`.
    ```bash
    lget theModule
    ```
-4. Generate the new checksum:
+4. Check that the new file is the one upstream released: compare it with the checksum upstream
+   publishes, or verify its signature (see
+   [Check the Source](/docs/development/module-writing#_3-check-the-source-and-get-the-checksum)).
+   The checksum you compute is what every user's download will be checked against.
+5. Generate the new checksum:
    ```bash
    sha256sum /var/spool/lunar/theModule-(whatever the new file name is)
    ```
-5. Insert this checksum in the SOURCE_VFY field in the DETAILS file, after `sha256:`
+6. Insert this checksum in the SOURCE_VFY field in the DETAILS file, after `sha256:`
 
 #### If You Are Correcting a Broken Link or Checksum Without Changing the Version:
 
 Leave the UPDATED field as it was so that people will not be forced to download and re-install.
+
+A checksum that stops matching without a new release is a warning, not a typo to fix. Find out why the file changed before you replace the checksum: some sites regenerate their archive downloads, but the file may also have been tampered with. Check the new file against upstream as described in the list above.
 
 ### Step 4: Test the Module
 
@@ -279,7 +285,7 @@ Test the build process thoroughly. Common issues:
 
 ### Checksum Mismatches
 
-Always generate fresh checksums:
+Always generate fresh checksums, from a file you have checked against upstream:
 
 ```bash
 sha256sum /var/spool/lunar/theModule-x.y.z.tar.gz
