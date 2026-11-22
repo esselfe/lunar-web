@@ -78,15 +78,15 @@ Every BUILD that installs files itself must call `prepare_install` first, right 
 
 Used in BUILD, after `prepare_install`, or in POST_BUILD.
 
-| Function                          | Does                                                                             |
-|-----------------------------------|----------------------------------------------------------------------------------|
-| `gather_docs file...`             | Copies files or directories from the source into `/usr/share/doc/$MODULE`        |
-| `ld_add dir`                      | Adds a library directory to `/etc/ld.so.conf.d/$MODULE.conf` and runs `ldconfig` |
-| `ld_remove dir`                   | Removes it again                                                                 |
-| `devoke_installwatch`             | Stops recording installed files                                                  |
-| `invoke_installwatch`             | Starts recording again                                                           |
-| `add_priv_group group [opts]`     | Creates a system group, if it doesn't exist                                      |
-| `add_priv_user user:group [opts]` | Creates a system user and its group, if they don't exist                         |
+| Function                   | Does                                                                                        |
+|----------------------------|---------------------------------------------------------------------------------------------|
+| `gather_docs file...`      | Copies files or directories from the source into the module's directory in `/usr/share/doc` |
+| `ld_add dir`               | Adds a library directory to the module's file in `/etc/ld.so.conf.d` and runs `ldconfig`    |
+| `ld_remove dir`            | Removes it again                                                                            |
+| `devoke_installwatch`      | Stops recording installed files                                                             |
+| `invoke_installwatch`      | Starts recording again                                                                      |
+| `add_priv_group group`     | Creates a system group, if it doesn't exist                                                 |
+| `add_priv_user user:group` | Creates a system user and its group, if they don't exist                                    |
 
 Files written while recording is stopped don't belong to the module, so `lrm` leaves them behind. Use that only for files that must survive a removal.
 
@@ -140,18 +140,19 @@ if in_depends $MODULE openssl || in_depends $MODULE libressl; then
 
 Set by Lunar while it runs a module's files:
 
-| Variable                                     | Holds                                                                                                      |
-|----------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| `MODULE`, `VERSION`                          | The module's name and version, from DETAILS                                                                |
-| `SOURCE`, `SOURCE2`, ...                     | The source file names, from DETAILS                                                                        |
-| `SOURCE_DIRECTORY`                           | Where the source is unpacked; default `$BUILD_DIRECTORY/$MODULE-$VERSION`                                  |
-| `BUILD_DIRECTORY`                            | The parent of all source directories, `/usr/src`                                                           |
-| `SOURCE_CACHE`                               | Where downloads are kept, `/var/spool/lunar`                                                               |
-| `SCRIPT_DIRECTORY`                           | The module's own directory in the moonbase, for files shipped with the module                              |
-| `MODULE_PREFIX`                              | The install prefix, `/usr` unless DETAILS sets it                                                          |
-| `OPTS`                                       | Build options collected from DEPENDS, CONFIGURE and `lin --opts`                                           |
-| `PLATFORM`                                   | The machine type, as in `DETAILS.x86_64`                                                                   |
-| `CATALYST_MODULE`, `CATALYST_MODULE_VERSION` | During a [CATALYST](/docs/development/module-basics#the-catalyst-file) trigger: the module that set it off |
+| Variable                 | Holds                                                                             |
+|--------------------------|-----------------------------------------------------------------------------------|
+| `MODULE`, `VERSION`      | The module's name and version, from DETAILS                                       |
+| `SOURCE`, `SOURCE2`, ... | The source file names, from DETAILS                                               |
+| `SOURCE_DIRECTORY`       | Where the source is unpacked; by default `$MODULE-$VERSION` in `$BUILD_DIRECTORY` |
+| `BUILD_DIRECTORY`        | The parent of all source directories, `/usr/src`                                  |
+| `SOURCE_CACHE`           | Where downloads are kept, `/var/spool/lunar`                                      |
+| `SCRIPT_DIRECTORY`       | The module's own directory in the moonbase, for files shipped with the module     |
+| `MODULE_PREFIX`          | The install prefix, `/usr` unless DETAILS sets it                                 |
+| `OPTS`                   | Build options collected from DEPENDS, CONFIGURE and `lin --opts`                  |
+| `PLATFORM`               | The machine type, as in `DETAILS.x86_64`                                          |
+
+During a [CATALYST](/docs/development/module-basics#the-catalyst-file) trigger, `CATALYST_MODULE` and `CATALYST_MODULE_VERSION` hold the name and version of the module that set it off.
 
 Add to `OPTS` with `OPTS+=" --option"`, so the options from DEPENDS and CONFIGURE are kept.
 
