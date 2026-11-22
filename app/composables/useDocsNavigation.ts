@@ -5,9 +5,17 @@ export type DocNavItem = {
   children: DocNavItem[]
 }
 
-const byOrderThenTitle = (a: DocNavItem, b: DocNavItem) =>
+type Ordered = { title: string, order?: number }
+
+const byOrderThenTitle = (a: Ordered, b: Ordered) =>
   (a.order ?? Number.POSITIVE_INFINITY) - (b.order ?? Number.POSITIVE_INFINITY)
   || a.title.localeCompare(b.title)
+
+/** The pages directly below `parentPath`, in sidebar order (`/docs/a/b` is below `/docs/a`, `/docs/a/b/c` isn't). */
+export const docsChildren = <T extends Ordered & { path: string }>(pages: T[], parentPath: string): T[] =>
+  pages
+    .filter(page => page.path.startsWith(`${parentPath}/`) && !page.path.slice(parentPath.length + 1).includes('/'))
+    .sort(byOrderThenTitle)
 
 /** Turns a flat list of doc pages into a tree keyed by URL path (`/docs/a/b` is a child of `/docs/a`). */
 export const buildDocsTree = (pages: Array<Omit<DocNavItem, 'children'>>, rootPath = '/docs'): DocNavItem[] => {
