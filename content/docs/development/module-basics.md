@@ -208,11 +208,7 @@ depends zlib
 depends %OSSL
 ```
 
-`depends` names one module that is always installed before this one. It can also take configure options, passed to the build when the dependency is present:
-
-```bash
-depends module [on_opts] [off_opts]
-```
+`depends` names one module that is always installed before this one.
 
 #### Optional Dependencies
 
