@@ -64,18 +64,20 @@ From now on `lin gzip` builds your copy. When you're done, `lvu unedit gzip` del
 Set the new `VERSION` and today's date in `UPDATED`. Leave `ENTERED` alone. The checksum comes in the next step:
 
 ```diff
-          MODULE=gzip
+           MODULE=gzip
 -         VERSION=1.13
 +         VERSION=1.14
-          SOURCE=$MODULE-$VERSION.tar.xz
-   SOURCE_URL[0]=$GNU_URL/$MODULE
-   SOURCE_URL[1]=http://www.funet.fi/pub/gnu/alpha/gnu/$MODULE
+           SOURCE=$MODULE-$VERSION.tar.xz
+    SOURCE_URL[0]=$GNU_URL/$MODULE
+    SOURCE_URL[1]=http://www.funet.fi/pub/gnu/alpha/gnu/$MODULE
 -      SOURCE_VFY=sha256:7454eb6935db17c6655576c2e1b0fabefd38b4d0936e0f87f48cd062ce91a057
 +      SOURCE_VFY=sha256:01a7b881bd220bfdf615f97b8718f80bdfd3f6add385b993dcf6efd14e8c0ac6
-        WEB_SITE=https://www.gzip.org
-         ENTERED=20010922
+         WEB_SITE=https://www.gzip.org
+          ENTERED=20010922
 -         UPDATED=20230820
 +         UPDATED=20250902
+            SHORT="Compression utility designed to replace compress"
+ 
 ```
 
 If the file name or URL contains the version written out, or the project changed how it names its releases (`v1.14` instead of `1.14`), fix that too.
