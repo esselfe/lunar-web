@@ -5,6 +5,9 @@ category: "installation"
 order: 1
 ---
 
-Learn how to install Lunar Linux on your system.
+Learn how to install Lunar Linux on your system, from checking your hardware to a running desktop.
 
-This section covers everything from system requirements to advanced installation scenarios.
+Check the [System Requirements](/docs/installation/requirements) first, then follow the [Installation Guide](/docs/installation/installation-guide) with the daily ISO from the [download page](/download).
+
+::section-index
+::

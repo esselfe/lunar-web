@@ -40,7 +40,7 @@ Learn alternative installation techniques when standard methods won't work:
 
 - [Module Basics](/docs/development/module-basics) - Introduction to Lunar modules
 - [Module Writing Guide](/docs/development/module-writing) - Create your own modules
-- [Module Function Reference](/docs/development/module-functions) - Available functions for module scripts
+- [Module Function Reference](/docs/development/module-functions) - Available functions for module files
 - [Module Submission](/docs/development/module-submission) - Contributing modules to Lunar
 
 ## Community Contributions
