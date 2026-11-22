@@ -2,33 +2,50 @@
 title: "Module Basics"
 description: "Understanding the structure and scripts that make up a Lunar Linux module"
 category: "development"
-tags: ["modules", "development", "BUILD", "DETAILS", "DEPENDS"]
-lastUpdated: 2025-11-02
+tags: ["modules", "development", "BUILD", "DETAILS", "DEPENDS", "CATALYST"]
+lastUpdated: 2026-11-22
 order: 1
 ---
 
-In Lunar parlance, software packages are called **modules**. The collection of all modules is the **moonbase**, which is simply a directory (usually `/var/lib/lunar/moonbase/`) containing sections (i.e. directories) which in turn contain the module directories.
+In Lunar parlance, software packages are called **modules**. The collection of all modules is the **moonbase**, which is simply a directory (usually `/var/lib/lunar/moonbase/`) containing sections (i.e. directories) which in turn contain the module directories. Your own modules, and your changes to existing ones, go in the `zlocal` section so a moonbase update doesn't overwrite them.
 
-A module is simply a directory containing the scripts necessary to build a software package, and optionally configuration files which may be needed in `/etc`.
+A module is simply a directory containing the files Lunar needs to build a software package, and optionally patches and configuration files.
 
-## Module Scripts Overview
+## Module Files Overview
 
-Some modules require only a DETAILS file, however this is only the case for a few modules in the entire moonbase. In each case, after DETAILS, DEPENDS, and CONFIGURE, where a module can use Lunar's default internal function(s), there is no need for a module-specific script.
+Only DETAILS is required. For everything else Lunar has a default, so a module needs a file only where the default doesn't fit. Many modules have just DETAILS and DEPENDS, plus a short BUILD that adds a few options.
 
 ### Core Module Files
 
 - **DETAILS** - Sets version, source URL(s) and other critical data
+- **DEPENDS** - Specifies required and optional modules
 - **CONFLICTS** - Specifies modules which must (will) be removed by module
+- **CATALYST** - Reacts when other modules are installed or removed (rebuild, remove, toggle an optional dependency, run a script)
 - **CONFIGURE** - Interactive script where build options can be set
-- **DEPENDS** - Specifies required and optional packages
-- **PRE_BUILD** - Most often used for patching, unpacking additional source tarballs
+- **PRE_BUILD** - Prepares the source: unpacking, extra sources, edits
 - **BUILD** - Runs necessary variations on: configure; make; make install
-- **POST_BUILD** - Install configuration scripts and data
+- **POST_BUILD** - Rarely needed; runs after BUILD while files are still tracked
 - **POST_INSTALL** - Messages, notes, more cleanups, configuration fixes
 - **PRE_REMOVE** - Used by `lrm`; actions which must precede removal
 - **POST_REMOVE** - Used by `lrm`; actions which must follow removal
 
-**Note:** Modules that require changes for 64-bit systems may also have `DETAILS.x86_64`, etc.
+Except for CATALYST, these files are bash: Lunar sources them. Any of them can have a platform variant, such as `DETAILS.x86_64`, which is used instead of the plain file on that platform.
+
+A module can also ship directories that Lunar installs by itself, such as `patch.d` and `systemd.d`. See [Module Directories](#module-directories).
+
+### The Order of a Build
+
+When you run `lin`, a module's files are used in this order:
+
+1. **DETAILS** is read
+2. **CONFIGURE** asks its questions
+3. **DEPENDS** is resolved and missing dependencies are built first
+4. The sources are downloaded and their checksums verified
+5. **PRE_BUILD** (or the default) unpacks the source
+6. **BUILD** (or the default) compiles and installs it
+7. **POST_BUILD**, if present, runs, and Lunar finishes recording the installed files
+8. **POST_INSTALL** runs
+9. **CATALYST** triggers in other modules fire
 
 ## Package Build and Install Scripts
 
@@ -39,79 +56,108 @@ The following scripts are used by `lin` or indirectly by `lunar` when building m
 Every module is required to have at least a DETAILS file. A minimal DETAILS may appear as follows:
 
 ```bash
-# /var/lib/lunar/moonbase/editors/emacs/DETAILS
-          MODULE=emacs
-         VERSION=21.3
-          SOURCE=$MODULE-$VERSION.tar.gz
-      SOURCE_URL=$GNU_URL/$MODULE
-      SOURCE_URL=ftp://ftp.gnu.org/pub/gnu/$MODULE
-      SOURCE_VFY=sha1:94d7ae9cb3aef05159cfff148265fc9ce0973980
-        WEB_SITE=http://www.gnu.org/software/emacs
+# /var/lib/lunar/moonbase/archive/gzip/DETAILS
+          MODULE=gzip
+         VERSION=1.14
+          SOURCE=$MODULE-$VERSION.tar.xz
+   SOURCE_URL[0]=$GNU_URL/$MODULE
+   SOURCE_URL[1]=http://www.funet.fi/pub/gnu/alpha/gnu/$MODULE
+      SOURCE_VFY=sha256:01a7b881bd220bfdf615f97b8718f80bdfd3f6add385b993dcf6efd14e8c0ac6
+        WEB_SITE=https://www.gzip.org
          ENTERED=20010922
-         UPDATED=20020529
-           SHORT="the extensible, self-documenting real-time display editor"
+         UPDATED=20250902
+           SHORT="Compression utility designed to replace compress"
 
 cat << EOF
-Emacs is the extensible, customizable, self-documenting real-time
-display editor.
+gzip - Compresses and decompresses files
+A compression utility designed to replace compress. Much better
+compression and freedom from patented algorithms are its main advantages
+over compress. Gzip decompresses files created by gzip, compress, or
+pack; it detects the input format automatically.
 EOF
 ```
 
-#### Common SOURCE_URL Mirrors
+`MODULE`, `VERSION`, `SOURCE`, `WEB_SITE`, `ENTERED`, `UPDATED` and `SHORT` are required. `MODULE` must match the module's directory name. Dates are written `yyyymmdd`.
 
-- `$GNOME_URL` - GNOME mirrors
+Line the `=` signs up in one column, leave one blank line before `cat << EOF`, and keep lines within 80 columns. `llint`, Lunar's module linter (in the `lunar-tools` module), checks all of this and can fix the layout for you.
+
+Use `$MODULE` and `$VERSION` instead of writing the name and version out, so a version bump only has to change `VERSION`, `SOURCE_VFY` and `UPDATED`.
+
+#### Source URLs
+
+`SOURCE_URL` is the directory the source is downloaded from; Lunar adds `$SOURCE` to it. List more than one as an array, and Lunar tries them in order:
+
+```bash
+SOURCE_URL[0]=$GNU_URL/$MODULE
+SOURCE_URL[1]=https://ftp.gnu.org/gnu/$MODULE
+```
+
+When the file name in the URL isn't the name you want to save it as, as with GitHub's `archive/v1.2.3.tar.gz` downloads, give the whole URL in `SOURCE_URL_FULL` instead, and set `SOURCE` to the name to save it under:
+
+```bash
+# /var/lib/lunar/moonbase/libs/xxhash/DETAILS (excerpt)
+          SOURCE=xxHash-$VERSION.tar.gz
+ SOURCE_URL_FULL=https://github.com/Cyan4973/xxHash/archive/v$VERSION.tar.gz
+SOURCE_DIRECTORY=$BUILD_DIRECTORY/xxHash-$VERSION
+```
+
+#### Mirror Variables
+
+For software hosted on the big mirror networks, start the URL with one of these variables instead of a single server:
+
 - `$GNU_URL` - GNU mirrors
-- `$KDE_URL` - KDE mirrors
+- `$GNOME_URL` - GNOME
+- `$KDE_URL` - KDE
+- `$KERNEL_URL` - kernel.org
 - `$SFORGE_URL` - SourceForge mirrors
-- `$LRESORT_URL` - lunar-linux mirrors
-- `$XFREE86_URL` - XFree86 mirrors
-- `$XORG_URL` - x.org packages mirrors
-- `$KERNEL_URL` - kernel, kernel tools mirrors
-- `$PATCH_URL` - The place for *.patch or *.diff files which are not downloadable from other public hosts
+- `$XORG_URL` - X.Org releases
+- `$NVIDIA_URL` - NVIDIA drivers
+- `$PATCH_URL` - Lunar's own server, for patches that can't be downloaded from anywhere else
 
-#### Why Use Mirror URLs?
+Users can point these at a mirror close to them, which makes downloads faster and keeps them working when one server is down. If every URL fails, Lunar also tries its own source cache at download.lunar-linux.org.
 
-The use of mirror URLs is very important because:
-- Downloads are faster because mirror is usually very close to user
-- If any mirror server fails there is another one on list so user is not left with broken download
-- International Internet connections are less blocked
+#### Checksums
+
+`SOURCE_VFY` checks that the downloaded file is the one the module was written for, and hasn't been corrupted or changed since:
+
+```bash
+SOURCE_VFY=sha256:01a7b881bd220bfdf615f97b8718f80bdfd3f6add385b993dcf6efd14e8c0ac6
+```
+
+Use `sha256:` for new modules. Lunar also checks `sha1:` and `md5:`, which older modules still use. Compute the checksum from the file you actually downloaded (`sha256sum file`), never copy it from somewhere else. Leave `SOURCE_VFY` out only for modules that download a snapshot from a git or other repository, where the source changes between downloads.
 
 #### Optional DETAILS Fields
 
-**PSAFE** - If the application does not compile on more than one thread:
+**SOURCE_DIRECTORY** - If the tarball doesn't unpack into the default `$BUILD_DIRECTORY/$MODULE-$VERSION`:
 ```bash
-PSAFE="no"
+SOURCE_DIRECTORY=$BUILD_DIRECTORY/xxHash-$VERSION
 ```
 
-**SOURCE_DIRECTORY** - If the tarball is not extracting into the default `$MODULE-$VERSION`:
+**Extra sources** - Number them, each with its own URL and checksum. Unpack them yourself in [PRE_BUILD](#the-pre_build-script):
 ```bash
-SOURCE_DIRECTORY=$BUILD_DIRECTORY/"$MODULE"_"$VERSION"_src
+         SOURCE2=$MODULE-manpages-$VERSION.tar.xz
+     SOURCE2_URL=https://www.kernel.org/pub/software/scm/git/
+     SOURCE2_VFY=sha256:6ea093f15745a9ac85fe1b1d4fe488413d54e68d0fcb10bab62f047f362cf6de
+```
+
+**TYPE** - Selects the default build when the software doesn't use `./configure`: `meson`, `cmake`, `python3`, `perl` and others. See [The BUILD Script](#the-build-script).
+```bash
+            TYPE=meson
+```
+
+**PSAFE** - If the software doesn't build with parallel make jobs:
+```bash
+PSAFE=no
 ```
 
 **MAINTAINER** - If you want your name in the module and be listed as maintainer:
 ```bash
-MAINTAINER=youremailadress
+      MAINTAINER=you@example.org
 ```
 
-**Multiple SOURCE_URLs** - List them as:
-```bash
-SOURCE_URL[0]=
-SOURCE_URL[1]=
-SOURCE_URL[2]=
-```
+**MODULE_PREFIX** - Installs somewhere other than `/usr`.
 
-**Multiple SOURCEs** - List them as:
-```bash
-SOURCE2=
-SOURCE3=
-SOURCE2_URL=
-SOURCE3_URL=
-```
-
-**Compiler Selection** - Force use of specific GCC version:
-```bash
-LUNAR_COMPILER=GCC_4_0  # or GCC_3_4 for gcc3
-```
+Flags such as `PSAFE`, `KEEP_SOURCE` and `USE_WRAPPERS` go on their own lines after the aligned block, without the alignment.
 
 #### When to Update the UPDATED Field
 
@@ -120,48 +166,15 @@ Update the UPDATED field only when you have:
 - Updated the version
 - Added configure options
 
-Don't change it just for formatting tweaks - don't force people to recompile if all you did was tidy up the file.
-
-For *-cvs or *-svn modules in zbeta, check Module Guidelines for special handling.
-
-#### SOURCE_VFY Field
-
-The SOURCE_VFY field checks that the downloaded source file has not been corrupted or changed since the module was last updated.
-
-- SHA1 checksums are preferred: `SOURCE_VFY=sha1:...`
-- MD5 sums can be used: `SOURCE_VFY=md5:...`
-- Should be omitted for modules that download snapshots from svn, cvs, git repositories because the sources could change between downloads
+Don't change it just for formatting tweaks - don't force people to recompile if all you did was tidy up the file. Never change `ENTERED`: it records when the module first appeared.
 
 #### MAINTAINER Field
 
 If you find a MAINTAINER field, please respect this and notify the person listed there that you will or have updated their module.
 
-#### DETAILS with Comments and Default Values
+#### The Description
 
-```bash
-          MODULE=emacs                                       # Module name, yes it's redundant
-         VERSION=21.3                                        # Version, changes often
-          SOURCE=$MODULE-$VERSION.tar.gz                     # Source filename
-SOURCE_DIRECTORY=$BUILD_DIRECTORY/$MODULE-$VERSION           # Where source unpacks
-                                                             # ($BUILD_DIRECTORY=/usr/src)
-   SOURCE_URL[0]=$GNU_URL/$MODULE                            # Download URL
-   SOURCE_URL[1]=ftp://ftp.gnu.org/pub/gnu/$MODULE          # Alternate URL(s)
-      SOURCE_VFY=sha1:94d7ae9cb3aef05159cfff148265fc9ce0973980 # Sets sha1 hash or pgp/gpg sig url
-        WEB_SITE=http://www.gnu.org/software/emacs           # Where to learn more
-         ENTERED=20010922                                    # First appearance in moonbase
-         UPDATED=20020529                                    # Date of latest change
-                                                             # Force update by setting this
-
-# The remaining lines are used for input to the 'lvu what' command
-# and are best copied from the source-maintainer's own description.
-
-           SHORT="the extensible, self-documenting real-time display editor"
-
-cat << EOF
-Emacs is the extensible, customizable, self-documenting real-time
-display editor.
-EOF
-```
+`SHORT` is a one-line summary, and the text between `cat << EOF` and `EOF` is the long description; both are shown by `lvu what`. They are best taken from the upstream project's own description. Use `cat << 'EOF'` if the text contains `` ` `` or `$`.
 
 ### The DEPENDS Script
 
@@ -169,61 +182,131 @@ The DEPENDS script is essential to configuration management and is the key to th
 
 **Warning:** Getting this right is difficult. Because the state of installed packages may vary widely, it's important to have a good understanding of what might or might not be installed on a target system.
 
-**Note:** By convention, Lunar does not include the X Window System (xfree86 or XOrg) in any dependency. There are two reasons:
-1. We expect users to understand that to use a graphical application locally, the X Window System must be installed
-2. Due to X11's unusual definition of client and server, it is often possible to build graphical applications for remote display without the server components locally installed
+**Note:** By convention, modules don't depend on the X server (`xorg-server`), only on the X libraries they use, such as `libX11`. There are two reasons:
+1. We expect users to understand that to use a graphical application locally, the X server must be installed
+2. Due to X11's unusual definition of client and server, it is often possible to build graphical applications for remote display without the server installed locally
 
-#### Required and Optional Dependencies
+Only modules that plug into the server itself, like the `xf86-video-*` and `xf86-input-*` drivers, depend on it.
 
-DEPENDS may include both required and optional dependencies:
+DEPENDS can use four functions:
+
+| Function                    | Declares                                                     |
+|-----------------------------|--------------------------------------------------------------|
+| `depends`                   | A required dependency                                        |
+| `optional_depends`          | An optional dependency the user is asked about               |
+| `optional_depends_requires` | Followers that go along with an optional dependency's answer |
+| `optional_depends_one_of`   | A choice of one module out of several                        |
+
+Write one call per line, without `&&`. Older modules end each line with `&&` to match their BUILD files, but it isn't needed and new DEPENDS files should leave it out.
+
+**Important:** You may not use `if module_installed...` or other general bash programming in the DEPENDS file to handle conditional dependencies. Lunar sources the same DEPENDS file in several contexts (resolving dependencies, building the dependency cache, checking installed modules) with these functions defined differently in each, so it has to contain nothing but calls to them. Use `optional_depends` and its relatives for anything conditional.
+
+#### Required Dependencies
 
 ```bash
-# /var/lib/lunar/moonbase/devel/subversion/DEPENDS
 depends zlib
-depends openssl
-optional_depends "db4" "--with-berkeley-db" "" "for creating local repositories"
-#                  ^            ^            ^                  ^
-#                  |            |            |                  |
-#     optional package       if "Y"       if "N"       explanatory comment
-#                        { ./configure strings }
+depends %OSSL
 ```
 
-The `depends` function determines one required package.
+`depends` names one module that is always installed before this one. It can also take configure options, passed to the build when the dependency is present:
 
-The `optional_depends` function consists of:
-1. The required package
-2. Necessary `--options` to give to `./configure` for yes
-3. Options for no
-4. An explanatory comment telling the user the purpose
-5. An optional preferred choice (normally depends on package state)
+```bash
+depends module [on_opts] [off_opts]
+```
 
-Many old modules use `&&` in DEPENDS to be consistent with BUILD files, but the `&&` delimiter is not required and new DEPENDS files should not use it.
+#### Optional Dependencies
 
-**Important:** You may not use `if module_installed...` or other general bash programming in the DEPENDS file to handle conditional dependencies. This is to keep the dependency tracking code in the Lunar tools as simple and fast as possible.
+```bash
+# /var/lib/lunar/moonbase/devel/git/DEPENDS
+depends python
+depends %OSSL
+depends zlib
+
+optional_depends curl   "--with-curl"    "" "for http(s) transports" y
+optional_depends pcre2  "--with-libpcre" "" "for perl regexp support in git-grep" y
+optional_depends tk     "--with-tcltk"   "" "for a Tk front-end git tool" n
+optional_depends cvsps  ""               "" "for CVS repository import" n
+```
+
+`optional_depends` takes up to five arguments:
+
+1. The optional module
+2. Options added to `$OPTS` (and so to `./configure`) when the user says yes
+3. Options added when the user says no
+4. A short explanation shown to the user, starting with "for ..."
+5. Optional: the default answer, `y` or `n`
+
+Without the fifth argument the default is `y` when the module is already installed and `n` when it isn't. Give a default when one answer is clearly better whatever is installed: git defaults to `y` for curl because most people want to clone over https.
+
+The answer is saved, so the user is only asked again when they reconfigure the module (`lin -r`). A few cases skip the question:
+
+- The module is already installed and both option strings are empty: it is used without asking.
+- The module is enforced (`lunar enforce`): it is always used.
+- The module is exiled: it is never used.
+
+#### Follower Dependencies
+
+Some optional dependencies only make sense together. A follower takes the same answer as its leader without asking:
+
+```bash
+optional_depends "SDL" "--enable-sdl" "--disable-sdl" "for SDL support"
+optional_depends_requires SDL SDL_ttf SDL_image SDL_mixer
+```
+
+When the user accepts SDL, SDL_ttf, SDL_image and SDL_mixer are accepted too; when they reject it, all three are rejected. The leader's `optional_depends` must come first. Followers carry no configure options of their own, so put any options the build needs on the leader.
+
+git uses this for its documentation, which needs xmlto as well as asciidoc:
+
+```bash
+optional_depends asciidoc "" "" "for git-doc 6 documentation" n
+optional_depends_requires asciidoc xmlto
+```
+
+#### Choosing One of Several
+
+When several modules provide the same feature and the build can use only one, offer them as a single choice:
+
+```bash
+optional_depends_one_of "SSL provider" \
+                        openssl  "--with-openssl"  "--without-openssl" \
+                        gnutls   "--with-gnutls"   "--without-gnutls" \
+                        libressl "--with-libressl" "--without-libressl"
+```
+
+The first argument is a heading shown to the user. The rest come in groups of three: module, options if chosen, options if not chosen. Lunar asks about each module in order; once the user accepts one, the remaining ones are rejected without asking. The user can also decline them all. On later runs the existing choice is kept without asking again.
+
+Each question defaults to `y` if that module is installed and `n` if it isn't. To pick a default for unattended installs, mark one module with `@`:
+
+```bash
+optional_depends_one_of "SSL provider" \
+                        @openssl  "--with-openssl"  "--without-openssl" \
+                         gnutls   "--with-gnutls"   "--without-gnutls" \
+                         libressl "--with-libressl" "--without-libressl"
+```
+
+When nobody answers before `PROMPT_DELAY` runs out, the `@` module is accepted and the others rejected, whatever is installed. Without a marker, an unattended run can end with none of them chosen when none is installed. Only one `@` counts per call; if there are several, the first wins.
 
 #### Aliases
 
-Aliases are a means to select a generic module. When you need functionality that can be provided by two or more software packages, you can select one of them to provide a correct dependency.
-
-Example `/var/lib/lunar/moonbase/aliases`:
+Aliases select a generic module. When you need functionality that two or more modules can provide, depend on the alias and the user picks the provider. Aliases are defined in the `aliases` file at the top of the moonbase (`/var/lib/lunar/moonbase/aliases`):
 
 ```bash
-%APACHE:apache apache2 apache-mod_ssl
-%FAM:fam gamin
-%GECKO_RENDERER:firefox thunderbird mozilla
-%GHOSTSCRIPT:espgs ghostscript
-%MTA:postfix exim sendmail esmtp
-%SLANG:slang slang2
-%X:XOrg XOrg-test xfree86 xfree86-beta
+%SSL:openssl libressl gnutls
+%OSSL:openssl libressl
 %XMLRENDERER:libxml2 expat
-%XSCREENSAVER:xscreensaver xscreensaver-gtk1 xscreensaver-kde
 ```
 
-You can choose an alias instead of a specific module:
+Use an alias anywhere a module name goes:
 
 ```bash
-depends %X
+depends %OSSL
 ```
+
+#### Cyclic Dependencies
+
+When two modules depend on each other (A depends on B and B depends on A, through required or optional dependencies), Lunar detects the cycle, accepts the dependency and prints a message saying so. The first module of the cycle is built without the second, then the second is built.
+
+That leaves the first module built without the feature the second provides. To rebuild it once the second is installed, give the first module a [CATALYST file](#the-catalyst-file) that watches the second.
 
 ### The CONFLICTS Script
 
@@ -236,27 +319,105 @@ Example:
 conflicts vim
 ```
 
-### The CONFIGURE Script
+### The CATALYST File
 
-The CONFIGURE script is used to collect interactive input from the user on optional parameters for the software build. Use the `query` function and provide a default answer to each question. The results are stored in configuration state files.
+A CATALYST file makes a module react when another module is installed or removed: rebuild itself, remove itself, switch an optional dependency on or off, or run a script. The module that owns the file is the *reactor*; the module it names is the *watched* module.
 
-A simple example:
+Unlike DEPENDS, CATALYST is not a bash script. Lunar reads it as data, one rule per line:
 
 ```bash
-# /var/lib/lunar/moonbase/crypto/gnupg/CONFIGURE
-if ! grep -q CONFIGURED $MODULE_CONFIG; then
-  if query "Enable experimental external HKP keyserver interface? " n; then
-    OPTS="$OPTS --enable-external-hkp"
-  fi
-  echo 'CONFIGURED="y"' >> $MODULE_CONFIG
-  echo 'OPTS='"$OPTS" >> $MODULE_CONFIG
-fi
+event watched_module action [param] [immediate]
 ```
 
-Another way is using `mquery`:
+Lines starting with `#` are comments.
+
+#### Events
+
+| Event            | Fires                                  |
+|------------------|----------------------------------------|
+| `on_install`     | after the watched module is installed  |
+| `on_pre_install` | before the watched module is installed |
+| `on_remove`      | after the watched module is removed    |
+| `on_pre_remove`  | before the watched module is removed   |
+
+#### Actions
+
+| Action    | What it does to the reactor                | `param`                                         |
+|-----------|--------------------------------------------|-------------------------------------------------|
+| `lin`     | Rebuilds it                                |                                                 |
+| `lrm`     | Removes it                                 |                                                 |
+| `fix`     | Runs integrity checks and repairs it       |                                                 |
+| `enable`  | Turns on one of its optional dependencies  | the dependency (defaults to the watched module) |
+| `disable` | Turns off one of its optional dependencies | the dependency (defaults to the watched module) |
+| `exec`    | Runs a script from its module directory    | the script's file name (required)               |
+
+`enable` and `disable` only change the saved answer to an `optional_depends` that the reactor's DEPENDS already declares; they don't rebuild anything. Pair them with a `lin` rule.
+
+#### Examples
 
 ```bash
-# Example from lilo module
+# /var/lib/lunar/moonbase/section/mymodule/CATALYST
+
+# Rebuild when openssl is installed, to pick up the new library:
+on_install openssl lin
+
+# Use moduleA as soon as it is installed, and stop using it when it is removed:
+on_install moduleA enable moduleA
+on_install moduleA lin
+on_remove  moduleA disable moduleA
+on_remove  moduleA lin
+
+# Remove this module when moduleB is removed:
+on_remove moduleB lrm
+
+# Run a script from this module's directory after a new kernel:
+on_install linux exec rebuild-for-kernel.sh
+
+# Check this module's files after glibc is updated:
+on_install glibc fix
+```
+
+#### When Triggers Fire
+
+`on_install` and `on_remove` triggers are collected while `lin` or `lrm` works through its list of modules, then fired together at the end. All `enable` and `disable` actions run first, so the rebuilds that follow see the new answers. If the same action for the same module is triggered more than once, it runs once: installing five libraries that mymodule watches rebuilds mymodule once, not five times.
+
+Add `immediate` to a rule when later modules in the same run depend on the result, for example when wget has to be rebuilt against a new openssl before the next module is built:
+
+```bash
+on_install openssl lin immediate
+```
+
+`on_pre_install` and `on_pre_remove` always fire immediately. `lin --catalyst-immediate` makes every trigger in that run fire straight after its watched module.
+
+A trigger only fires when:
+
+- the reactor module is installed (a CATALYST file has no effect until its module is)
+- the watched module is not being removed as part of an upgrade (`lrm -u`, which `lin` uses when it replaces a module); `on_install` still fires when the new version is installed
+- for `lin`, the reactor isn't held; held modules are skipped with a notice
+
+Each trigger fires at most once per run, even when the actions start their own `lin` or `lrm`, so two modules that watch each other can't loop. If an action fails, Lunar reports it and writes it to the activity log, but the install or removal that set it off still counts as successful.
+
+#### Exec Scripts
+
+The script given to `exec` must be inside the reactor's module directory; Lunar refuses paths that lead outside it. It is sourced in a subshell with the reactor's DETAILS loaded, `MODULE` set to the reactor and `SCRIPT_DIRECTORY` set to its module directory. Two more variables say what set it off:
+
+- `CATALYST_MODULE`: the watched module
+- `CATALYST_MODULE_VERSION`: its version
+
+The same variables are set while a triggered `lin` builds the reactor, so its BUILD can tell why it is being rebuilt.
+
+#### The Trigger Cache
+
+Lunar collects every CATALYST rule in the moonbase into `/var/state/lunar/catalyst.cache`. The cache is rebuilt after a moonbase update and whenever a CATALYST file changes, so a new or edited file takes effect on the next `lin` or `lrm`. Files in `zlocal` are included when `ZLOCAL_OVERRIDES` is on. Rules with an unknown event or action, and `exec` rules without a script, are skipped.
+
+### The CONFIGURE Script
+
+The CONFIGURE script collects input from the user on optional parameters for the build. It runs before DEPENDS, and the answers are saved, so the user is only asked again when they reconfigure the module (`lin -r`).
+
+Most questions are a single `mquery`:
+
+```bash
+# /var/lib/lunar/moonbase/system/lilo/CONFIGURE
 mquery RUN_LILO "Run LILO automatically upon LILO upgrades?" y
 ```
 
@@ -264,101 +425,116 @@ mquery RUN_LILO "Run LILO automatically upon LILO upgrades?" y
 mquery ENABLE_FOO "Enable foo?" n "--enable-foo --enable-foo2" "--disable-foo --disable-foo2"
 ```
 
-Where "No" would be the default answer. When the user chooses to enable-foo, answer "yes" is stored in the ENABLE_FOO variable and `--enable-foo --enable-foo2` will be added to the `./configure` command in the BUILD script.
+`mquery` takes a variable name, the question and the default answer (`y` or `n`), and optionally options for yes and for no. It saves the answer (`y` or `n`) as the module's setting for that variable and adds the matching options to `$OPTS`. In the second example "no" is the default; if the user says yes, `--enable-foo --enable-foo2` is added to `$OPTS` and so to the build's `./configure`.
+
+To read a saved answer later, in BUILD or POST_INSTALL, use `get_module_config`:
+
+```bash
+if [ "$(get_module_config RUN_LILO)" = "y" ]; then
+  lilo
+fi
+```
+
+For anything else, `query "question" y` asks a yes/no question, and `set_module_config VAR value` saves a setting.
 
 ### The PRE_BUILD Script
 
-PRE_BUILD is used where special processing is needed before undertaking the actual build steps. Typical requirements include:
-- Unpacking multiple sources
-- Creating necessary system or source-tree directories
-- Applying source patches
-
-Example:
+PRE_BUILD prepares the source before the build. Without one, Lunar runs `default_pre_build`, which creates the source directory, unpacks `$SOURCE` and changes into `$SOURCE_DIRECTORY`. A PRE_BUILD replaces that, so it usually starts by calling it:
 
 ```bash
-# /var/lib/lunar/moonbase/doc-tools/html2db/PRE_BUILD
-mk_source_dir $SOURCE_DIRECTORY  &&
-unpack $SOURCE                   &&
-cd $MODULE
+# /var/lib/lunar/moonbase/devel/git/PRE_BUILD
+default_pre_build &&
+
 unpack $SOURCE2
-cd tidy
-patch_it $SOURCE_CACHE/$SOURCE3 0
-cd /usr/src/$MODULE
 ```
+
+Typical jobs for PRE_BUILD:
+- Unpacking extra sources (`unpack $SOURCE2`)
+- Small edits to the source, with `sedit 's/old/new/' file`
+- Creating directories the build needs
+
+`sedit` is `sed -i`: it doesn't tell you when the pattern no longer matches, so check your edits still apply after a version bump.
+
+Patches don't need PRE_BUILD: put them in the module's `patch.d` directory and Lunar applies them. See [Module Directories](#module-directories).
 
 ### The BUILD Script
 
-BUILD is used where the `default_build()` function does not work for a given software package.
+BUILD is used where the default build doesn't work for a given software package, or needs extra options.
 
 #### Default Build Process
 
-Function `default_build()` calls `default_config` which executes:
+Without a BUILD file Lunar runs `default_build`, which picks a build by the `TYPE` set in DETAILS:
+
+| TYPE      | Build                                                                             |
+|-----------|-----------------------------------------------------------------------------------|
+| none      | GNU autotools: `./configure`, `make`, `make install`                              |
+| `meson`   | `meson setup`, `ninja`, `ninja install`                                           |
+| `cmake`   | `cmake` (with Ninja when it is installed), `cmake --build`, `cmake --install`     |
+| `python3` | `python3 setup.py build` and `install`, for projects that still ship a `setup.py` |
+| `perl`    | `Makefile.PL` or `Build.PL`                                                       |
+| `game`    | autotools, installing into `/usr/games` and `/usr/share/games`                    |
+
+The autotools build (`default_gnu_build`) first calls `default_config`, which runs:
 
 ```bash
-./configure  --build=$BUILD            \
-             --prefix=/usr             \
-             --sysconfdir=/etc         \
-             --localstatedir=/var      \
-             --infodir=/usr/share/info \
-             --mandir=/usr/share/man   \
-             $OPTS
+./configure --build=$BUILD                      \
+            --prefix=$MODULE_PREFIX             \
+            --sysconfdir=/etc                   \
+            --localstatedir=/var                \
+            --infodir=$MODULE_PREFIX/share/info \
+            --mandir=$MODULE_PREFIX/share/man   \
+            $OPTS
 ```
 
-Next, `default_build()` calls `default_make` which executes:
+`$MODULE_PREFIX` is `/usr` unless DETAILS sets it. If there is no `configure` script but there is a Makefile, this step is skipped. Then `default_make` runs:
 
 ```bash
-make &&
+make ${MAKES:+-j$MAKES} &&
 prepare_install &&
 make install
 ```
 
-The `prepare_install` should only be called immediately before the `make install` phase, so that the package management system only tracks the installed files and not any intermediate build files.
+#### prepare_install
 
-**Note (2011-02-20):** Be aware that several modules in the moonbase appear to get this wrong, so take care!
+`prepare_install` must be called right before anything is installed. It removes the old version of the module if one is installed, then starts recording every file written, so Lunar knows which files belong to the module and can remove them later. Files installed before it aren't recorded, and a build that installs nothing after it fails with "does not call prepare_install or installs zero files".
 
-#### For Git/SVN/CVS Modules
-
-If you have modules from git, svn or cvs, the configure script is missing most of the time. You can use the `default_cvs_build()` function:
-
-```bash
-./autogen.sh --prefix=/usr
-```
-
-It will then call `default_make()`.
+Install straight into `/`, not into a `DESTDIR`; Lunar records what gets written.
 
 #### Custom BUILD Examples
 
-Where the default build configuration does not work, the BUILD script provides the needed steps. About 75% of modules need a BUILD script.
-
-Example 1:
+Most BUILD files add options and then call a default build:
 
 ```bash
 # /var/lib/lunar/moonbase/archive/gzip/BUILD
-./configure --build=$BUILD            \
-            --prefix=/usr             \
-            --bindir=/bin             \
-            --infodir=/usr/share/info \
-            --mandir=/usr/share/man   &&
-make &&
-prepare_install &&
-make bindir=/bin install
-```
+OPTS+=" --bindir=/bin"
 
-Example 2:
+default_build
+```
 
 ```bash
-# /var/lib/lunar/moonbase/editors/ex/BUILD
-cd $SOURCE_DIRECTORY                    &&
-sedit 's/usr.local/usr/' Makefile       &&
-sedit 's/= man/= share\/man/' Makefile  &&
-sedit 's/ucb/bin/' Makefile             &&
-sedit 's/= termlib/= ncurses/' Makefile &&
-make                                    &&
-prepare_install                         &&
-make install
+# /var/lib/lunar/moonbase/net/iputils/BUILD
+OPTS+=" -DBUILD_MANS=false \
+        -DBUILD_HTML_MANS=false"
+
+default_meson_build
 ```
 
-The first example is a build which needs non-standard 'configure' and 'make install' commands. The second is a build which does not use GNU auto-tools' 'configure' script.
+Calling `default_meson_build` or `default_cmake_build` directly works without setting `TYPE`. When the options depend on what the user chose in DEPENDS, put them in the `optional_depends` call rather than in BUILD.
+
+Software without a configure script or build system is built by hand:
+
+```bash
+# /var/lib/lunar/moonbase/libs/xxhash/BUILD
+make PREFIX=/usr DISPATCH=1 &&
+
+prepare_install &&
+
+make PREFIX=/usr DISPATCH=1 DESTDIR="" install &&
+
+rm -f /usr/lib/libxxhash.a
+```
+
+Source from a git checkout often has no `configure` script yet; run `./autogen.sh` first, then `default_build`.
 
 #### Using && in BUILD Scripts
 
@@ -366,81 +542,97 @@ In the examples above, BUILD scripts contain multiple commands separated by `&&`
 
 The use of `&&` is **required** in multi-command BUILD scripts.
 
+#### Things to Know
+
+- BUILD runs in `$SOURCE_DIRECTORY`. Files shipped in the module directory are in `$SCRIPT_DIRECTORY`.
+- Lunar puts its compiler wrappers first in `PATH` while building. The `make` wrapper adds `-j$MAKES` to every `make` call, so you don't need to. Set `PSAFE=no` in DETAILS for software that breaks with parallel jobs, and `USE_WRAPPERS=off` to turn the wrappers off.
+- The build's output goes to the compile log, kept in `/var/log/lunar/compile/`; don't redirect it yourself.
+- Use `in_depends $MODULE foo` to test whether the user chose optional dependency foo.
+
 ### The POST_BUILD Script
 
-POST_BUILD runs in place of the `default_post_build` routine which is used to install minor documentation and transfer/enable initialization scripts and similar system data, mostly into `/etc`.
+POST_BUILD runs after BUILD, while Lunar is still recording installed files. After it, Lunar runs its own post-build steps: it installs the files from the module's directories (`systemd.d`, `tmpfiles.d`, `config.d` and the others), runs `ldconfig` and finishes the record of installed files.
 
-**Note:** POST_BUILD script usage is deprecated. You should install your config files in BUILD (remember not to overwrite previous config files!) or install defaults from POST_INSTALL (again, do not overwrite present files!). The ability to use a POST_BUILD script is purely for certain internal functions.
+**Note:** POST_BUILD is rarely needed, and only a handful of modules have one. Install files in BUILD instead (remember not to overwrite existing configuration files), or install defaults from POST_INSTALL (again, not overwriting files that are already there).
 
 ### The POST_INSTALL Script
 
-POST_INSTALL has no equivalent functions and is run to handle post-installation work in a general manner.
+POST_INSTALL runs after the module is installed, to finish setting it up. Its changes aren't recorded as part of the module, so `lrm` won't undo them; this makes it the place for things that should survive a removal or that depend on the machine.
 
 Example:
 
 ```bash
-# /var/lib/lunar/moonbase/compilers/gcc/POST_INSTALL
-cd /usr/lib/gcc-lib/$BUILD/$VERSION                      &&
-ln    -sf /usr/bin/cpp cpp                               &&
-cd /lib/                                                 &&
-ln    -sf /usr/bin/cpp cpp                               &&
-if [ ! -e /usr/bin/cc ]; then
-  ln -s gcc /usr/bin/cc
+# /var/lib/lunar/moonbase/doc-tools/man/POST_INSTALL
+if module_installed xserver; then
+  if [ ! -e "/etc/man.conf" ] ; then
+    cd /etc &&
+    ln -sf /usr/share/misc/man.conf man.conf
+  fi
 fi
 ```
 
 As in BUILD scripts, the `&&` represent 'and' operations, but their use in POST_INSTALL scripts is preferred rather than required.
 
+Don't use POST_INSTALL to create users or install services; use `sysusers.d` and `systemd.d` (see [Module Directories](#module-directories)). To rebuild another module after this one is installed, put an `on_install` rule in that module's [CATALYST file](#the-catalyst-file) rather than calling `lin` from POST_INSTALL.
+
+## Module Directories
+
+Some directories in a module are installed by Lunar, or by plugins shipped with other modules, without any script:
+
+| Directory      | What happens                                                                                                                                                    |
+|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `patch.d/`     | Patches are applied to the source at the start of the build, in name order (prefix them `01-`, `02-` to set the order). Compressed patches work too.            |
+| `systemd.d/`   | Service files are installed into `/usr/lib/systemd/system/`. The user is asked whether to enable each one, and running services are restarted after an upgrade. |
+| `sysusers.d/`  | `*.conf` files are installed into `/usr/lib/sysusers.d/` and applied before the build, so the users and groups exist when the software is installed.            |
+| `tmpfiles.d/`  | Files are installed into `/usr/lib/tmpfiles.d/` and applied with `systemd-tmpfiles --create`.                                                                   |
+| `config.d/`    | Files are installed into `/etc/config.d/`, but only if not already there, so local changes are kept.                                                            |
+| `profile.d/`   | `*.rc` files are installed into `/etc/profile.d/` (by the bash module).                                                                                         |
+| `skel/`        | Files are copied into `/etc/skel/` (by the bash module).                                                                                                        |
+| `pam.d/`       | PAM configuration (by the Linux-PAM module).                                                                                                                    |
+| `logrotate.d/` | logrotate configuration (by the logrotate module).                                                                                                              |
+| `xinetd.d/`    | xinetd services (by the xinetd module). The `services` file adds port definitions to `/etc/services`.                                                           |
+| `plugin.d/`    | Plugins that extend Lunar itself.                                                                                                                               |
+
+Keep module directories small: every moonbase update downloads them. A large patch or extra file belongs on a server, as an extra source (`SOURCE2`) in DETAILS.
+
 ## Package Removal Scripts
 
-Module removal is handled by `lrm`. Because installation is monitored and backup tarballs are created using installwatch, most of package removal is handled automatically using the logs created by installwatch. However, we provide for additional actions to be taken through the PRE_REMOVE and POST_REMOVE scripts.
+Module removal is handled by `lrm`. Because Lunar recorded every file the module installed, most of the removal is automatic. PRE_REMOVE and POST_REMOVE handle anything else.
 
 ### The PRE_REMOVE Script
 
-PRE_REMOVE is needed to execute any tasks needed prior to the main task of removing all files installed by the module.
+PRE_REMOVE runs before the module's files are removed. Use it to stop or undo things that need the module's files to still be there.
 
 Example:
 
 ```bash
-# /var/lib/lunar/moonbase/mail/docbook-3.1/PRE_REMOVE
-CENTRALIZED=/etc/sgml/catalog
-DOCBOOK_INSTALL_DIR=/usr/share/sgml/docbook/$VERSION
-install-catalog -r $CENTRALIZED $DOCBOOK_INSTALL_DIR/catalog
+# /var/lib/lunar/moonbase/net/resolvconf/PRE_REMOVE
+resolvconf --wipe-runtime-directories &&
+rmdir "`readlink /etc/resolvconf/run`" &&
+
+if [ -L /etc/resolv.conf ] && [ "`readlink /etc/resolv.conf`" = "/etc/resolvconf/run/resolv.conf" ]; then
+  rm /etc/resolv.conf
+fi &&
+
+if [ -e /etc/resolvconf/resolv.conf.d/original ]; then
+  cp /etc/resolvconf/resolv.conf.d/original /etc/resolv.conf
+fi
 ```
+
+Services from `systemd.d` are disabled automatically before removal.
 
 ### The POST_REMOVE Script
 
-POST_REMOVE may be used to remove data not tracked by installwatch and to correctly adjust remaining configuration files and data.
+POST_REMOVE runs after the files are removed. Use it to remove data that wasn't recorded and to adjust remaining configuration files and data.
 
-Example 1:
-
-```bash
-# /var/lib/lunar/moonbase/devel/binutils/POST_REMOVE
-install-info  --delete as         --info-dir /usr/info
-install-info  --delete bfd        --info-dir /usr/info
-install-info  --delete binutils   --info-dir /usr/info
-install-info  --delete configure  --info-dir /usr/info
-install-info  --delete gasp       --info-dir /usr/info
-install-info  --delete gprof      --info-dir /usr/info
-install-info  --delete ld         --info-dir /usr/info
-```
-
-Example 2:
+Example:
 
 ```bash
-# /var/lib/lunar/moonbase/compilers/php/POST_REMOVE
-if    module_installed  apache;  then
-  cp        /etc/httpd/httpd.conf       /tmp/httpd.conf
-  grep  -v  "LoadModule php4_module"    /tmp/httpd.conf  |
-  grep  -v  "AddModule mod_php4.c"   >  /etc/httpd/httpd.conf
-  rm    -f  /tmp/httpd.conf
-elif  module_installed  apache_mod_ssl;  then
-  cp        /etc/httpsd/httpd.conf      /tmp/httpd.conf
-  grep  -v  "LoadModule php4_module"    /tmp/httpd.conf  |
-  grep  -v  "AddModule mod_php4.c"   >  /etc/httpsd/httpd.conf
-  rm    -f  /tmp/httpd.conf
-fi
+# /var/lib/lunar/moonbase/archive/gzip/POST_REMOVE
+install-info --delete gzip --info-dir /usr/share/info
 ```
+
+PRE_REMOVE and POST_REMOVE don't run when `lin` replaces the module with a new version (the old version is removed with `lrm --upgrade`), so they can safely undo things the new version would need.
 
 ## Related Topics
 

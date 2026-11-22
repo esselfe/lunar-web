@@ -48,6 +48,8 @@ Functions for handling module dependencies:
 
 - `depends` - Declare required dependencies
 - `optional_depends` - Declare optional dependencies
+- `optional_depends_requires` - Make modules follow an optional dependency's answer
+- `optional_depends_one_of` - Offer a choice of one module out of several
 - `conflicts` - Specify conflicting modules
 
 ### Configuration
@@ -64,6 +66,7 @@ A typical Lunar module consists of several scripts:
 
 - `DETAILS` - Module metadata (name, version, sources)
 - `DEPENDS` - Dependency declarations
+- `CATALYST` - Triggers that react to other modules being installed or removed
 - `CONFIGURE` - Configuration questions
 - `BUILD` - Build instructions
 - `PRE_BUILD` - Pre-build setup
