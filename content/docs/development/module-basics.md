@@ -1,6 +1,6 @@
 ---
 title: "Module Basics"
-description: "Understanding the structure and scripts that make up a Lunar Linux module"
+description: "Understanding the structure and files that make up a Lunar Linux module"
 category: "development"
 tags: ["modules", "development", "BUILD", "DETAILS", "DEPENDS", "CATALYST"]
 lastUpdated: 2026-11-22
@@ -21,7 +21,7 @@ Only DETAILS is required. For everything else Lunar has a default, so a module n
 - **DEPENDS** - Specifies required and optional modules
 - **CONFLICTS** - Specifies modules which must (will) be removed by module
 - **CATALYST** - Reacts when other modules are installed or removed (rebuild, remove, toggle an optional dependency, run a script)
-- **CONFIGURE** - Interactive script where build options can be set
+- **CONFIGURE** - Asks the user questions that set build options
 - **PRE_BUILD** - Prepares the source: unpacking, extra sources, edits
 - **BUILD** - Runs necessary variations on: configure; make; make install
 - **POST_BUILD** - Rarely needed; runs after BUILD while files are still tracked
@@ -47,11 +47,11 @@ When you run `lin`, a module's files are used in this order:
 8. **POST_INSTALL** runs
 9. **CATALYST** triggers in other modules fire
 
-## Package Build and Install Scripts
+## Build and Install Files
 
-The following scripts are used by `lin` or indirectly by `lunar` when building modules.
+The following files are used by `lin` or indirectly by `lunar` when building modules.
 
-### The DETAILS Script
+### The DETAILS File
 
 Every module is required to have at least a DETAILS file. A minimal DETAILS may appear as follows:
 
@@ -133,14 +133,14 @@ Use `sha256:` for new modules. Lunar also checks `sha1:` and `md5:`, which older
 SOURCE_DIRECTORY=$BUILD_DIRECTORY/xxHash-$VERSION
 ```
 
-**Extra sources** - Number them, each with its own URL and checksum. Unpack them yourself in [PRE_BUILD](#the-pre_build-script):
+**Extra sources** - Number them, each with its own URL and checksum. Unpack them yourself in [PRE_BUILD](#the-pre_build-file):
 ```bash
          SOURCE2=$MODULE-manpages-$VERSION.tar.xz
      SOURCE2_URL=https://www.kernel.org/pub/software/scm/git/
      SOURCE2_VFY=sha256:6ea093f15745a9ac85fe1b1d4fe488413d54e68d0fcb10bab62f047f362cf6de
 ```
 
-**TYPE** - Selects the default build when the software doesn't use `./configure`: `meson`, `cmake`, `python3`, `perl` and others. See [The BUILD Script](#the-build-script).
+**TYPE** - Selects the default build when the software doesn't use `./configure`: `meson`, `cmake`, `python3`, `perl` and others. See [The BUILD File](#the-build-file).
 ```bash
             TYPE=meson
 ```
@@ -176,9 +176,9 @@ If you find a MAINTAINER field, please respect this and notify the person listed
 
 `SHORT` is a one-line summary, and the text between `cat << EOF` and `EOF` is the long description; both are shown by `lvu what`. They are best taken from the upstream project's own description. Use `cat << 'EOF'` if the text contains `` ` `` or `$`.
 
-### The DEPENDS Script
+### The DEPENDS File
 
-The DEPENDS script is essential to configuration management and is the key to the overall operation of Lunar. Dependencies should be exactly specified, preferably not assuming the presence of any other modules, while knowing the sub-dependencies of the modules which are added and not adding those explicitly where not needed.
+The DEPENDS file is essential to configuration management and is the key to the overall operation of Lunar. Dependencies should be exactly specified, preferably not assuming the presence of any other modules, while knowing the sub-dependencies of the modules which are added and not adding those explicitly where not needed.
 
 **Warning:** Getting this right is difficult. Because the state of installed packages may vary widely, it's important to have a good understanding of what might or might not be installed on a target system.
 
@@ -304,9 +304,9 @@ When two modules depend on each other (A depends on B and B depends on A, throug
 
 That leaves the first module built without the feature the second provides. To rebuild it once the second is installed, give the first module a [CATALYST file](#the-catalyst-file) that watches the second.
 
-### The CONFLICTS Script
+### The CONFLICTS File
 
-This script is simply used to specify modules which will be removed when a given module is installed.
+This file is simply used to specify modules which will be removed when a given module is installed.
 
 Example:
 
@@ -319,7 +319,7 @@ conflicts vim
 
 A CATALYST file makes a module react when another module is installed or removed: rebuild itself, remove itself, switch an optional dependency on or off, or run a script. The module that owns the file is the *reactor*; the module it names is the *watched* module.
 
-Unlike DEPENDS, CATALYST is not a bash script. Lunar reads it as data, one rule per line:
+Unlike the other module files, CATALYST is not bash. Lunar reads it as data, one rule per line:
 
 ```bash
 event watched_module action [param] [immediate]
@@ -406,9 +406,9 @@ The same variables are set while a triggered `lin` builds the reactor, so its BU
 
 Lunar collects every CATALYST rule in the moonbase into `/var/state/lunar/catalyst.cache`. The cache is rebuilt after a moonbase update and whenever a CATALYST file changes, so a new or edited file takes effect on the next `lin` or `lrm`. Files in `zlocal` are included when `ZLOCAL_OVERRIDES` is on. Rules with an unknown event or action, and `exec` rules without a script, are skipped.
 
-### The CONFIGURE Script
+### The CONFIGURE File
 
-The CONFIGURE script collects input from the user on optional parameters for the build. It runs before DEPENDS, and the answers are saved, so the user is only asked again when they reconfigure the module (`lin -r`).
+The CONFIGURE file collects input from the user on optional parameters for the build. It runs before DEPENDS, and the answers are saved, so the user is only asked again when they reconfigure the module (`lin -r`).
 
 Most questions are a single `mquery`:
 
@@ -433,7 +433,7 @@ fi
 
 For anything else, `query "question" y` asks a yes/no question, and `set_module_config VAR value` saves a setting.
 
-### The PRE_BUILD Script
+### The PRE_BUILD File
 
 PRE_BUILD prepares the source before the build. Without one, Lunar runs `default_pre_build`, which creates the source directory, unpacks `$SOURCE` and changes into `$SOURCE_DIRECTORY`. A PRE_BUILD replaces that, so it usually starts by calling it:
 
@@ -453,7 +453,7 @@ Typical jobs for PRE_BUILD:
 
 Patches don't need PRE_BUILD: put them in the module's `patch.d` directory and Lunar applies them. See [Module Directories](#module-directories).
 
-### The BUILD Script
+### The BUILD File
 
 BUILD is used where the default build doesn't work for a given software package, or needs extra options.
 
@@ -532,11 +532,11 @@ rm -f /usr/lib/libxxhash.a
 
 Source from a git checkout often has no `configure` script yet; run `./autogen.sh` first, then `default_build`.
 
-#### Using && in BUILD Scripts
+#### Using && in BUILD Files
 
-In the examples above, BUILD scripts contain multiple commands separated by `&&` to ensure that execution stops as soon as any command fails. The `&&` are 'and' operations: the command after the `&&` will only be run if the one before the `&&` completed successfully.
+In the examples above, BUILD files contain multiple commands separated by `&&` to ensure that execution stops as soon as any command fails. The `&&` are 'and' operations: the command after the `&&` will only be run if the one before the `&&` completed successfully.
 
-The use of `&&` is **required** in multi-command BUILD scripts.
+The use of `&&` is **required** in multi-command BUILD files.
 
 #### Things to Know
 
@@ -545,13 +545,13 @@ The use of `&&` is **required** in multi-command BUILD scripts.
 - The build's output goes to the compile log, kept in `/var/log/lunar/compile/`; don't redirect it yourself.
 - Use `in_depends $MODULE foo` to test whether the user chose optional dependency foo.
 
-### The POST_BUILD Script
+### The POST_BUILD File
 
 POST_BUILD runs after BUILD, while Lunar is still recording installed files. After it, Lunar runs its own post-build steps: it installs the files from the module's directories (`systemd.d`, `tmpfiles.d`, `config.d` and the others), runs `ldconfig` and finishes the record of installed files.
 
 **Note:** POST_BUILD is rarely needed, and only a handful of modules have one. Install files in BUILD instead (remember not to overwrite existing configuration files), or install defaults from POST_INSTALL (again, not overwriting files that are already there).
 
-### The POST_INSTALL Script
+### The POST_INSTALL File
 
 POST_INSTALL runs after the module is installed, to finish setting it up. Its changes aren't recorded as part of the module, so `lrm` won't undo them; this makes it the place for things that should survive a removal or that depend on the machine.
 
@@ -567,13 +567,13 @@ if module_installed xserver; then
 fi
 ```
 
-As in BUILD scripts, the `&&` represent 'and' operations, but their use in POST_INSTALL scripts is preferred rather than required.
+As in BUILD files, the `&&` represent 'and' operations, but their use in POST_INSTALL files is preferred rather than required.
 
 Don't use POST_INSTALL to create users or install services; use `sysusers.d` and `systemd.d` (see [Module Directories](#module-directories)). To rebuild another module after this one is installed, put an `on_install` rule in that module's [CATALYST file](#the-catalyst-file) rather than calling `lin` from POST_INSTALL.
 
 ## Module Directories
 
-Some directories in a module are installed by Lunar, or by plugins shipped with other modules, without any script:
+Lunar installs some directories of a module by itself, or with plugins shipped with other modules:
 
 | Directory      | What happens                                                                                                                                                    |
 |----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -591,11 +591,11 @@ Some directories in a module are installed by Lunar, or by plugins shipped with 
 
 Keep module directories small: every moonbase update downloads them. A large patch or extra file belongs on a server, as an extra source (`SOURCE2`) in DETAILS.
 
-## Package Removal Scripts
+## Removal Files
 
 Module removal is handled by `lrm`. Because Lunar recorded every file the module installed, most of the removal is automatic. PRE_REMOVE and POST_REMOVE handle anything else.
 
-### The PRE_REMOVE Script
+### The PRE_REMOVE File
 
 PRE_REMOVE runs before the module's files are removed. Use it to stop or undo things that need the module's files to still be there.
 
@@ -617,7 +617,7 @@ fi
 
 Services from `systemd.d` are disabled automatically before removal.
 
-### The POST_REMOVE Script
+### The POST_REMOVE File
 
 POST_REMOVE runs after the files are removed. Use it to remove data that wasn't recorded and to adjust remaining configuration files and data.
 

@@ -101,7 +101,7 @@ This DETAILS file already can be all you need for writing a module, depending on
 
 ## Module Format
 
-See [Module Basics](/docs/development/module-basics) for detailed information about available module scripts and module examples.
+See [Module Basics](/docs/development/module-basics) for detailed information about the module files and module examples.
 
 ## Creating the DETAILS File
 
@@ -151,9 +151,9 @@ optional_depends "gtk+" \
                  "for GUI support"
 ```
 
-## Creating a BUILD Script
+## Creating a BUILD File
 
-If the default build process doesn't work, create a BUILD script:
+If the default build process doesn't work, create a BUILD file:
 
 ```bash
 # /var/lib/lunar/moonbase/zlocal/mymodule/BUILD
@@ -319,7 +319,7 @@ See [Module Submission](/docs/development/module-submission) for information on 
 
 ## Resources
 
-- [Module Basics](/docs/development/module-basics) - Detailed script documentation
+- [Module Basics](/docs/development/module-basics) - Detailed documentation of the module files
 - [Module Functions](/docs/development/module-functions) - Available function reference
 - [Moonbase](/docs/package-management/moonbase) - Understanding the repository structure
 

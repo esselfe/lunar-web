@@ -1,6 +1,6 @@
 ---
 title: "Module Function Reference"
-description: "Reference guide for functions available in Lunar module scripts"
+description: "Reference guide for functions available in Lunar module files"
 category: "development"
 tags: ["development", "modules", "functions", "api"]
 order: 4
@@ -60,9 +60,9 @@ Functions for module configuration:
 - `set_option` - Set module-specific options
 - `get_option` - Retrieve module options
 
-## Module Script Structure
+## Module File Structure
 
-A typical Lunar module consists of several scripts:
+A typical Lunar module consists of several files:
 
 - `DETAILS` - Module metadata (name, version, sources)
 - `DEPENDS` - Dependency declarations
