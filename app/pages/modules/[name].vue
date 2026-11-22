@@ -1,16 +1,16 @@
 <template>
   <div class="px-6 pt-10 pb-24">
-    <div class="container mx-auto max-w-5xl">
+    <div class="container mx-auto max-w-4xl">
       <!-- Stops at the section: the next crumb would repeat the <h1> -->
       <Breadcrumb :items="[{ label: 'Modules', path: '/modules' }, { label: module.section, path: `/modules/section/${module.section}` }]" />
 
-      <div class="mt-10 grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_17rem] lg:grid-cols-[minmax(0,1fr)_21rem]">
+      <div class="mt-10 grid grid-cols-1 items-center gap-10 md:grid-cols-[minmax(0,1fr)_17rem] lg:grid-cols-[minmax(0,1fr)_21rem]">
         <header>
           <h1 class="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-4xl font-bold tracking-[-0.035em] text-white sm:text-5xl">
-            <span class="break-all">{{ module.name }}</span>
+            <span class="[overflow-wrap:anywhere]">{{ module.name }}</span>
             <span
               v-if="module.version"
-              class="text-2xl font-semibold tracking-normal text-indigo-200 tabular-nums sm:text-3xl"
+              class="text-2xl font-semibold tracking-normal [overflow-wrap:anywhere] text-indigo-200 tabular-nums sm:text-3xl"
             >{{ module.version }}</span>
           </h1>
           <p class="mt-4 text-lg text-gray-300">
@@ -42,7 +42,7 @@
             </button>
           </div>
 
-          <p class="mt-6 text-sm text-gray-400">
+          <p class="mt-6 text-sm text-balance text-gray-400">
             {{ summary }}
           </p>
         </header>
@@ -62,7 +62,7 @@
       </div>
 
       <!-- Facts -->
-      <dl class="mt-14 grid gap-x-10 gap-y-5 border-y border-white/10 py-8 text-sm sm:grid-cols-2 lg:grid-cols-3">
+      <dl class="mt-14 grid grid-cols-1 gap-x-10 gap-y-5 border-y border-white/10 py-8 text-sm sm:grid-cols-2 lg:grid-cols-3">
         <div v-if="isUrl(module.website)">
           <dt class="text-gray-500">
             Website
@@ -126,7 +126,7 @@
         </div>
       </dl>
 
-      <div class="mt-14 grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div class="mt-14 grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div class="space-y-14">
           <section
             v-if="paragraphs.length"
