@@ -27,7 +27,7 @@
               {{ doc.title }}
             </span>
             <span
-              v-if="doc.archived"
+              v-if="doc.archived && !/archived/i.test(doc.title)"
               class="text-xs font-semibold tracking-wide text-gray-500 uppercase"
             >Archived</span>
           </span>
