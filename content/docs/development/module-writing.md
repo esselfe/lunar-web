@@ -31,7 +31,15 @@ Look at what the software needs. If its dependencies aren't in the moonbase eith
 
 ## 1. Create the Module
 
-Your own modules go in the `zlocal` section of the moonbase, `/var/lib/lunar/moonbase/zlocal/`, where a moonbase update won't touch them. Lunar finds new modules there without any setting.
+Your own modules go in the `zlocal` section of the moonbase, `/var/lib/lunar/moonbase/zlocal/`, where a moonbase update won't touch them.
+
+Lunar only looks in zlocal when zlocal overrides are on. Without them, `lin` and `lvu` can't find a module that exists only in zlocal. Turn them on once:
+
+```bash
+lunar set ZLOCAL_OVERRIDES on
+```
+
+With overrides on, a module in zlocal also takes the place of a moonbase module with the same name. That is how you change an existing module: `lvu edit` copies it into zlocal (see [Module Submission](/docs/development/module-submission)).
 
 The quickest start is `lvu new`:
 

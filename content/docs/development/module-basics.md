@@ -7,7 +7,7 @@ lastUpdated: 2026-11-22
 order: 1
 ---
 
-In Lunar parlance, software packages are called **modules**. The collection of all modules is the **moonbase**, which is simply a directory (usually `/var/lib/lunar/moonbase/`) containing sections (i.e. directories) which in turn contain the module directories. Your own modules, and your changes to existing ones, go in the `zlocal` section so a moonbase update doesn't overwrite them.
+In Lunar parlance, software packages are called **modules**. The collection of all modules is the **moonbase**, which is simply a directory (usually `/var/lib/lunar/moonbase/`) containing sections (i.e. directories) which in turn contain the module directories. Your own modules, and your changes to existing ones, go in the `zlocal` section so a moonbase update doesn't overwrite them. Lunar only uses zlocal when `ZLOCAL_OVERRIDES` is on (`lunar set ZLOCAL_OVERRIDES on`).
 
 A module is simply a directory containing the files Lunar needs to build a software package, and optionally patches and configuration files.
 
