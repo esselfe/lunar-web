@@ -39,7 +39,7 @@ Lunar only looks in zlocal when zlocal overrides are on. Without them, `lin` and
 lunar set ZLOCAL_OVERRIDES on
 ```
 
-With overrides on, a module in zlocal also takes the place of a moonbase module with the same name. That is how you change an existing module: `lvu edit` copies it into zlocal (see [Module Submission](/docs/development/module-submission)).
+With overrides on, a module in zlocal also takes the place of a moonbase module with the same name. That is how you change an existing module: `lvu edit` copies it into zlocal (see [Updating an Existing Module](/docs/development/module-submission#updating-an-existing-module)).
 
 The quickest start is `lvu new`:
 

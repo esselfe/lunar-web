@@ -22,7 +22,7 @@ const routeOf = (file) => {
 const files = walk(contentDir).filter(file => file.endsWith('.md'))
 const routes = new Set(files.map(routeOf))
 // Pages that are not Markdown but exist in the built site.
-const extraRoutes = new Set(['/', '/news', '/rss.xml', '/sitemap.xml', '/robots.txt', '/search.json', '/favicon.ico'])
+const extraRoutes = new Set(['/', '/news', '/modules', '/rss.xml', '/sitemap.xml', '/robots.txt', '/search.json', '/favicon.ico'])
 
 const errors = []
 

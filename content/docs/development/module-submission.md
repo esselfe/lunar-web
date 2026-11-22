@@ -1,350 +1,177 @@
 ---
 title: "Module Submission"
-description: "How to submit new or updated modules to the official Lunar Linux moonbase"
+description: "How to update a module and submit new or updated modules to the official Lunar Linux moonbase"
 category: "development"
 tags: ["modules", "submission", "contributing", "moonbase"]
-lastUpdated: 2026-11-21
+lastUpdated: 2026-11-22
 order: 3
 ---
 
-The official Moonbase is maintained and updated by the Lunar Linux developers. But what if there isn't a module in the Moonbase for the package that you want, or it is not the latest version, or it is out-of-date in some other way?
+The moonbase is maintained by the Lunar developers, but anyone can contribute to it. When a module is missing, out of date or broken, you can report it, or fix it yourself and send the fix as a pull request on GitHub.
 
-## Why Would I Want to Submit a Module?
+## Report It or Fix It
 
-You have several options when you encounter a missing or outdated module:
+To report a problem:
 
-1. **Report the problem** via:
-   - An issue on the module's moonbase repository on [GitHub](https://github.com/lunar-linux)
-   - The [Lunar mailing lists](http://lists.lunar-linux.org/cgi-bin/mailman/listinfo)
-   - [#lunar](https://web.libera.chat/#lunar) IRC channel on [Libera.Chat](https://libera.chat/)
-   - Hope that someone can help you
+- open an issue on the module's moonbase repository on [GitHub](https://github.com/lunar-linux) (see [Find the Repository](#_1-find-the-repository))
+- ask in [#lunar](https://web.libera.chat/#lunar) on [Libera.Chat](https://libera.chat/)
+- write to the [Lunar mailing lists](http://lists.lunar-linux.org/cgi-bin/mailman/listinfo)
 
-2. **Scratch your itch the open source way:**
-   - Create or update the module yourself using the information in:
-     - [Module Basics](/docs/development/module-basics)
-     - [Writing Modules](/docs/development/module-writing)
-   - Remember to work in the **zlocal** section so your updates are not lost the next time you download a new Moonbase
+To fix it yourself, update the module as described below, or write a new one with [Writing Modules](/docs/development/module-writing). Then share it: other people probably want the same module, and may improve it further.
 
-3. **Share your work:**
-   - Maybe other people could benefit from your module
-   - Maybe other people could improve your module
-   - Open a pull request so the Lunar developers can review it and merge it into the Moonbase
+## What Gets Accepted
 
-## Acceptance and Rejection Criteria
+Pull requests are usually accepted when they:
 
-### Submissions Will Probably Be Accepted If They:
+- add a new or missing module
+- update a module to a new version
+- fix download or website URLs
+- add dependencies the module needs
+- add BUILD options that make a failing module build
 
-- Introduce a new or missing module into the moonbase
-- Provide an updated version of a module
-- Provide updated download and website URLs
-- Provide missing dependencies required to build the module
-- Add BUILD options that enable a failing module to build
+They are likely to be rejected when they:
 
-### Submissions Are Likely to Be Rejected If They:
+- fail `llint`, or don't download or build
+- make system-specific changes that not every user wants
+- remove explicit dependencies in favour of ones that happen to be installed
+- update one part of a larger suite that has to be updated and tested together (X, KDE, GNOME)
+- replace a recent stable version with an svn or git development version
+- change a core module, or one known to cause update problems for other modules, without discussing it first
 
-- Do not follow the formatting guidelines given in the documentation
-- Fail to download sources correctly, or fail to build
-- Introduce system-specific changes that not all users will want
-- Remove explicit dependencies in favor of implicit ones
-- Form part of a larger suite of modules that need to be updated and tested together (such as an X, KDE or GNOME component)
-- Introduce an svn or git development version of a module that already has a recent, stable version
-- Change a core module, or one which is known to cause update problems for other tools
+## Updating an Existing Module
 
-## How Do I Create a New Module?
+As an example, this is how gzip went from version 1.13 to 1.14.
 
-The easiest way is to run:
+### 1. Copy the Module to zlocal
 
-```bash
-lvu new theModule
-```
-
-It will ask for:
-- URLs for the source tarball
-- Website URL
-- Short and long description entries
-
-Then it creates a basic DETAILS file for you. Follow the guidelines below to complete the module.
-
-## How Do I Update a Module?
-
-Let's assume that you have found that theModule no longer downloads and installs properly and you want to fix it.
-
-### Step 1: Copy the Module to zlocal
-
-Modules in zlocal only take the place of the moonbase copy when zlocal overrides are on. Turn them on
-once:
+Your copy goes in the `zlocal` section, where a moonbase update won't overwrite it. Lunar only uses zlocal when zlocal overrides are on, so turn them on once:
 
 ```bash
 lunar set ZLOCAL_OVERRIDES on
 ```
 
-Then copy the module:
+Then copy the module and change into its directory:
 
 ```bash
-lvu edit theModule
+lvu edit gzip
+lvu cd gzip
 ```
 
-This copies the existing theModule files to zlocal. (Without the setting, `lvu edit` stops with
-"Cannot edit modules when ZLOCAL_OVERRIDES == off".)
+From now on `lin gzip` builds your copy. When you're done, `lvu unedit gzip` deletes it and Lunar uses the moonbase's again.
 
-### Step 2: Navigate to the Module Directory
+### 2. Change DETAILS
+
+Set the new `VERSION` and today's date in `UPDATED`. Leave `ENTERED` alone. The checksum comes in the next step:
+
+```diff
+          MODULE=gzip
+-         VERSION=1.13
++         VERSION=1.14
+          SOURCE=$MODULE-$VERSION.tar.xz
+   SOURCE_URL[0]=$GNU_URL/$MODULE
+   SOURCE_URL[1]=http://www.funet.fi/pub/gnu/alpha/gnu/$MODULE
+-      SOURCE_VFY=sha256:7454eb6935db17c6655576c2e1b0fabefd38b4d0936e0f87f48cd062ce91a057
++      SOURCE_VFY=sha256:01a7b881bd220bfdf615f97b8718f80bdfd3f6add385b993dcf6efd14e8c0ac6
+        WEB_SITE=https://www.gzip.org
+         ENTERED=20010922
+-         UPDATED=20230820
++         UPDATED=20250902
+```
+
+If the file name or URL contains the version written out, or the project changed how it names its releases (`v1.14` instead of `1.14`), fix that too.
+
+When you're only fixing a broken URL, without a new version, leave `UPDATED` as it was, so nobody rebuilds for nothing.
+
+### 3. Check the Source and Update the Checksum
+
+Download the new version and check that it is the one upstream released. GNU signs its releases, so gzip's signature can be checked against the GNU keyring:
 
 ```bash
-lvu cd theModule
+lget gzip
+cd /var/spool/lunar
+wget https://ftp.gnu.org/gnu/gzip/gzip-1.14.tar.xz.sig https://ftp.gnu.org/gnu/gnu-keyring.gpg
+gpg --no-default-keyring --keyring ./gnu-keyring.gpg --verify gzip-1.14.tar.xz.sig gzip-1.14.tar.xz
 ```
 
-Or manually change into the directory given by `lvu edit`.
-
-### Step 3: Edit the DETAILS File
-
-#### If You Are Updating Because There Is a New Release:
-
-1. Modify the version number to the latest one available
-2. Edit the UPDATED date to today's date
-3. Download the new version:
-   ```bash
-   lget theModule
-   ```
-4. Check that the new file is the one upstream released: compare it with the checksum upstream
-   publishes, or verify its signature (see
-   [Check the Source](/docs/development/module-writing#_3-check-the-source-and-get-the-checksum)).
-   The checksum you compute is what every user's download will be checked against.
-5. Generate the new checksum:
-   ```bash
-   sha256sum /var/spool/lunar/theModule-(whatever the new file name is)
-   ```
-6. Insert this checksum in the SOURCE_VFY field in the DETAILS file, after `sha256:`
-
-#### If You Are Correcting a Broken Link or Checksum Without Changing the Version:
-
-Leave the UPDATED field as it was so that people will not be forced to download and re-install.
-
-A checksum that stops matching without a new release is a warning, not a typo to fix. Find out why the file changed before you replace the checksum: some sites regenerate their archive downloads, but the file may also have been tampered with. Check the new file against upstream as described in the list above.
-
-### Step 4: Test the Module
+Only when it says "Good signature" do you compute the checksum and put it in `SOURCE_VFY`:
 
 ```bash
-# Test building and installation
-lin theModule
-
-# Test, test and test again!
+sha256sum /var/spool/lunar/gzip-1.14.tar.xz
 ```
 
-### Step 5: Verify Installation
+The checksum you write down is what every user's download is checked against, so it must come from a file you have checked. Not every project signs its releases: [Check the Source](/docs/development/module-writing#_3-check-the-source-and-get-the-checksum) lists the other ways to check.
+
+A checksum that stops matching without a new release is a warning, not a typo to fix. Find out why the file changed before you replace the checksum: some sites regenerate their archive downloads, but the file may also have been tampered with.
+
+### 4. Check What Changed Upstream
+
+Read the release notes (often a `NEWS` file in the source) and compare the build files with the old version's:
+
+- new or removed dependencies: update DEPENDS
+- new or renamed build options: update the options in DEPENDS or BUILD
+- patches in `patch.d` that upstream has merged: delete them; ones that no longer apply: update them
+- `sedit` lines in PRE_BUILD: check the text they change is still there, because `sedit` doesn't complain when nothing matches
+
+### 5. Test It
 
 ```bash
-# Make sure it hasn't installed files where it shouldn't
-lvu install theModule
-
-# Check whether you need to create or update DEPENDS
-lvu links theModule
+llint gzip
+lin gzip
 ```
 
-### Additional Files
+Then check the result as in [Build and Test It](/docs/development/module-writing#_8-build-and-test-it): the installed files, `lvu links`, and that `lrm` removes it cleanly.
 
-Many modules only require a DETAILS file. Others may also need:
-- DEPENDS
-- BUILD
-- PRE_BUILD
-- POST_INSTALL
-- x86_64 versions of the files
+`lvu diff gzip` shows everything you changed compared with the moonbase's copy.
 
-See [Module Basics](/docs/development/module-basics) for more information.
+## Submitting a Pull Request
 
-## How Do I Submit the Module?
+The moonbase is split across several repositories in the [lunar-linux organisation](https://github.com/lunar-linux) on GitHub: `moonbase-core`, `moonbase-other`, `moonbase-xorg`, `moonbase-kde`, `moonbase-gnome`, `moonbase-gnome3`, `moonbase-xfce` and `moonbase-efl`. Each module lives in exactly one of them.
 
-Modules are submitted as pull requests on GitHub. The Moonbase is split across several repositories
-in the [lunar-linux organisation](https://github.com/lunar-linux): `moonbase-core`, `moonbase-other`,
-`moonbase-xorg`, `moonbase-kde`, `moonbase-gnome`, `moonbase-gnome3`, `moonbase-xfce` and
-`moonbase-efl`. Each module lives in exactly one of them.
+### 1. Find the Repository
 
-Once you have successfully installed the module using `lin -rc theModule`:
+Look the module up in the [module browser](/modules): its page shows the repository and folder, for example `moonbase-core/archive/gzip`. The first line of `lvu diff gzip` also names the section (`a/archive/gzip`).
 
-### Step 1: Find the Module's Repository
+A new module goes in the repository and section where similar modules live. `moonbase-core` holds the base system, so most new modules belong in `moonbase-other`. Ask in #lunar if you're not sure.
 
-`lvu where theModule` shows the module's section (for example `devel`). Find that section directory in
-one of the moonbase repositories. A brand new module goes in the repository and section that fit it
-best; ask on IRC if you're not sure.
+### 2. Fork, Branch and Copy Your Changes In
 
-### Step 2: Fork and Branch
+Fork the repository on GitHub, clone your fork and create a branch. Copy the module's files from your zlocal copy into the matching folder of your clone, and review them with `git diff`.
 
-Fork that repository on GitHub, clone your fork and create a branch for your change.
+### 3. Commit
 
-### Step 3: Copy Your Changes In
+Make one commit per module, with a first line of the form `module: what changed`. For a version bump, the moonbase's usual wording is "version bumped to":
 
-Copy the module files from your zlocal copy (see `lvu edit` above) into the matching directory of
-your clone, then review them with `git diff`.
-
-### Step 4: Commit and Open a Pull Request
-
-Commit with a message in the form described below, push the branch to your fork and open a pull
-request against the Lunar repository. Keep each pull request to one module, or to a set of modules that
-have to change together.
-
-### Step 5: Wait for Review
-
-Each pull request is checked automatically by `llint`, Lunar's module linter, where the repository
-has it set up; fix anything it reports. A developer will then review it. Remember that:
-
-- The Lunar development team is quite small
-- They are all working in their spare time and have real lives and other commitments
-- Some submissions require specific hardware/software environments to be able to install and test them properly
-
-## Commit Message Guidelines
-
-Use the form `module: short description` for the first line. If you want to add more context, leave
-one blank line and then write the longer description.
-
-### Good Commit Message Examples:
-
-```
-foo: version bumped to 2.1.3
-
-Fixes a security vulnerability. Also adds the missing
-dependency on bar.
+```text
+gzip: version bumped to 1.14
 ```
 
-```
-baz: new module, a network monitoring tool
-
-Tested on x86_64. Optional dependency on gtk+ for the GUI.
+```text
+brightnessctl: new module for screen brightness control
 ```
 
-### Poor Commit Message Examples:
+If there is more to say, such as why a dependency changed, leave a blank line and explain it below. Messages like `update`, `fix` or `please merge` don't tell anyone what changed.
 
-```
-updated
-```
+### 4. Open the Pull Request
 
-```
-fix
-```
+Push the branch to your fork and open a pull request against the Lunar repository. Keep each pull request to one module, or to a set of modules that have to change together.
 
-```
-I updated this module please accept it
-```
+### 5. Checks and Review
 
-## Best Practices
+In `moonbase-core`, `moonbase-other` and `moonbase-xorg`, every pull request is checked automatically:
 
-### Before Submitting
+- **lint** runs `llint` on the modules you changed and posts any errors as a comment
+- **Jenkins** builds each module you changed in a fresh Lunar container
 
-1. **Test thoroughly:**
-   ```bash
-   # Clean build
-   lrm theModule
-   lin -rc theModule
-   ```
+The other repositories have no automatic checks yet, so test your module carefully before sending it there.
 
-2. **Check dependencies:**
-   ```bash
-   lvu links theModule
-   ```
-
-3. **Verify files:**
-   ```bash
-   lvu install theModule
-   ```
-
-4. **Test removal:**
-   ```bash
-   lrm theModule
-   lin theModule
-   ```
-
-### Formatting Guidelines
-
-- Follow the formatting in existing modules
-- Use consistent indentation
-- Include all necessary fields in DETAILS
-- Add comments where helpful
-- Use proper shell syntax
-
-### Documentation
-
-- Provide a clear SHORT description
-- Write a detailed long description
-- Document any non-obvious build options
-- Explain any patches or workarounds
-
-## Common Issues
-
-### Download Failures
-
-Make sure the SOURCE_URL is correct and the file is still available:
-
-```bash
-lget theModule
-```
-
-### Build Failures
-
-Test the build process thoroughly. Common issues:
-- Missing dependencies
-- Incorrect configure options
-- Platform-specific problems
-
-### Checksum Mismatches
-
-Always generate fresh checksums, from a file you have checked against upstream:
-
-```bash
-sha256sum /var/spool/lunar/theModule-x.y.z.tar.gz
-```
-
-## Advanced Submissions
-
-### Multiple Files
-
-If your module requires multiple source files:
-
-```bash
-SOURCE2=$MODULE-docs-$VERSION.tar.gz
-SOURCE2_URL=https://example.com/
-SOURCE2_VFY=sha256:...
-```
-
-### Platform-Specific Changes
-
-For 64-bit specific changes, create:
-- `DETAILS.x86_64`
-- `BUILD.x86_64`
-
-### Patches
-
-If you need to include patches:
-
-1. Create the patch file
-2. Add it to the module directory
-3. Reference it in PRE_BUILD:
-   ```bash
-   patch_it $SOURCE_CACHE/mymodule-fix.patch 1
-   ```
-
-## The Developer's Perspective
-
-For an idea of how the developers process submissions, the development team:
-
-1. Reviews pull requests on GitHub
-2. Tests the module if possible
-3. Checks for formatting and guideline compliance
-4. Merges accepted pull requests into the moonbase
-5. Comments on pull requests that need changes
-
-Patience is appreciated - the team works on this in their spare time!
+Fix whatever the checks report by pushing more commits to the same branch. A developer then reviews the pull request, tests it where possible, and merges it or asks for changes. The team is small and works in its spare time, and some modules need particular hardware to test, so a review can take a while.
 
 ## Getting Help
 
-If you have questions about submitting modules:
-
-- Ask on #lunar IRC channel
-- Post to the [Lunar mailing lists](http://lists.lunar-linux.org/cgi-bin/mailman/listinfo)
-- Check existing modules for examples
-- Review the documentation
+Ask in [#lunar](https://web.libera.chat/#lunar) on Libera.Chat or on the [mailing lists](http://lists.lunar-linux.org/cgi-bin/mailman/listinfo). When you're unsure how to do something in a module, find a module that builds the same way and see how it does it.
 
 ## Related Topics
 
-- [Module Basics](/docs/development/module-basics) - Understanding module structure
-- [Writing Modules](/docs/development/module-writing) - Creating new modules
-- [Moonbase](/docs/package-management/moonbase) - Understanding the repository
-
-Remember: Every submission helps make Lunar Linux better for everyone!
+- [Writing Modules](/docs/development/module-writing) - Creating a new module, step by step
+- [Module Basics](/docs/development/module-basics) - Every module file and option
+- [Moonbase](/docs/package-management/moonbase) - How the moonbase is organised
