@@ -1,104 +1,168 @@
 ---
 title: "Module Function Reference"
-description: "Reference guide for functions available in Lunar module files"
+description: "The Lunar functions and variables available in module files, grouped by the file they are used in"
 category: "development"
-tags: ["development", "modules", "functions", "api"]
+tags: ["development", "modules", "functions", "variables"]
+lastUpdated: 2026-11-22
 order: 4
 ---
 
-This page provides a comprehensive reference for functions available when writing Lunar Linux modules.
+Lunar runs module files in bash with its own function library loaded, so DEPENDS, BUILD, POST_INSTALL and the others can call these functions directly. This page lists the ones modules use, grouped by where they are used. [Module Basics](/docs/development/module-basics) explains the files themselves.
 
-**Status:** This documentation is currently under development. Content is being migrated and expanded.
+All of them are ordinary shell functions that return true or false, so chain them with `&&` like any other command.
 
-## Overview
+## Dependencies
 
-Lunar modules can use a variety of built-in functions provided by the Lunar package management system. These functions handle common tasks like downloading sources, applying patches, installing files, and managing dependencies.
+Used in DEPENDS and CONFLICTS, and nowhere else. [The DEPENDS File](/docs/development/module-basics#the-depends-file) describes them in full.
 
-## Common Module Functions
+| Function                                              | Does                                                    |
+|-------------------------------------------------------|---------------------------------------------------------|
+| `depends module`                                      | Always installs `module` before this one                |
+| `optional_depends module on off "for ..." [y\|n]`     | Asks the user, and adds `on` or `off` to `$OPTS`        |
+| `optional_depends_requires leader followers...`       | Makes the followers take the leader's answer            |
+| `optional_depends_one_of "heading" module on off ...` | Lets the user choose one module out of several          |
+| `conflicts module`                                    | Removes `module` when this one is installed (CONFLICTS) |
 
-### Source Management
+## Preparing the Source
 
-Functions for handling source code downloads and extraction:
+Used in PRE_BUILD.
 
-- `download_source` - Download source tarballs
-- `unpack_source` - Extract downloaded archives
-- `verify_source` - Verify checksums and signatures
+| Function                     | Does                                                                                                         |
+|------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `default_pre_build`          | What runs without a PRE_BUILD: creates `$SOURCE_DIRECTORY`, unpacks `$SOURCE` and changes into it            |
+| `unpack file`                | Unpacks `$SOURCE_CACHE/file` into the current directory: `unpack $SOURCE2`                                   |
+| `mk_source_dir [dir]`        | Creates an empty `dir` (default `$SOURCE_DIRECTORY`), removing an old one first                              |
+| `sedit 'expression' file...` | Runs `sed -i` on the files                                                                                   |
+| `patch_it file level`        | Applies a patch, compressed or not, with `patch -p<level>`; a bare file name is looked up in `$SOURCE_CACHE` |
 
-### Build Functions
+`sedit` doesn't report when the expression matches nothing, so check that your edits still apply after a version bump. For patches that ship with the module, the `patch.d` directory is simpler than `patch_it`: see [Module Directories](/docs/development/module-basics#module-directories).
 
-Functions used during the build process:
+## Building
 
-- `default_build` - Standard configure/make/make install sequence
-- `default_config` - Run ./configure with common options
-- `default_make` - Run make with appropriate flags
-- `default_install` - Run make install
+Used in BUILD. The build commands run in `$SOURCE_DIRECTORY`.
 
-### File Management
+| Function                | Does                                                                              |
+|-------------------------|-----------------------------------------------------------------------------------|
+| `default_build`         | What runs without a BUILD: picks one of the builds below by `TYPE`                |
+| `default_gnu_build`     | `default_config`, then `default_make` (the build when `TYPE` isn't set)           |
+| `default_config`        | `./configure` with Lunar's prefix and directories, plus `$OPTS`                   |
+| `default_make`          | `make`, then `default_install`                                                    |
+| `default_install`       | `prepare_install`, then `make install`                                            |
+| `default_meson_build`   | `default_meson_config`, `ninja`, `prepare_install`, `ninja install`               |
+| `default_meson_config`  | `meson setup` into `$MODULE-$VERSION/`, with `$OPTS`                              |
+| `default_cmake_build`   | `default_cmake_config`, `cmake --build`, `prepare_install`, `cmake --install`     |
+| `default_cmake_config`  | `cmake -B $MODULE-$VERSION` (Ninja if installed), with `$OPTS`                    |
+| `default_python3_build` | `python3 setup.py build` and `install`, for projects that still ship a `setup.py` |
+| `default_perl_build`    | `Makefile.PL` or `Build.PL`                                                       |
+| `default_game_build`    | autotools, installing into `/usr/games` and `/usr/share/games`                    |
+| `prepare_install`       | Removes the installed version and starts recording installed files                |
+| `bad_flags flag...`     | Removes flags from `CFLAGS`, `CXXFLAGS`, `CPPFLAGS` and `LDFLAGS`                 |
 
-Functions for file and directory operations:
+The usual BUILD adds options and calls one of the defaults:
 
-- `install_file` - Install files to specific locations
-- `install_dir` - Create directory structures
-- `make_link` - Create symbolic links
-- `safe_remove` - Safely remove files
+```bash
+# /var/lib/lunar/moonbase/net/iputils/BUILD
+OPTS+=" -DBUILD_MANS=false \
+        -DBUILD_HTML_MANS=false"
 
-### Dependency Management
+default_meson_build
+```
 
-Functions for handling module dependencies:
+The `*_config` functions only configure. Call one when you need your own build or install commands after it: the build directory is `$MODULE-$VERSION`, inside the source.
 
-- `depends` - Declare required dependencies
-- `optional_depends` - Declare optional dependencies
-- `optional_depends_requires` - Make modules follow an optional dependency's answer
-- `optional_depends_one_of` - Offer a choice of one module out of several
-- `conflicts` - Specify conflicting modules
+Every BUILD that installs files itself must call `prepare_install` first, right before installing; see [prepare_install](/docs/development/module-basics#prepare_install).
 
-### Configuration
+`bad_flags` takes flags to remove (`bad_flags -ffast-math`), or `compiler`, `linker` or `ALL` to drop the compiler flags, the linker flags or both. Use it when software breaks with the user's optimizations.
 
-Functions for module configuration:
+## Installing Extra Files
 
-- `query` - Ask user questions during installation
-- `set_option` - Set module-specific options
-- `get_option` - Retrieve module options
+Used in BUILD, after `prepare_install`, or in POST_BUILD.
 
-## Module File Structure
+| Function                          | Does                                                                             |
+|-----------------------------------|----------------------------------------------------------------------------------|
+| `gather_docs file...`             | Copies files or directories from the source into `/usr/share/doc/$MODULE`        |
+| `ld_add dir`                      | Adds a library directory to `/etc/ld.so.conf.d/$MODULE.conf` and runs `ldconfig` |
+| `ld_remove dir`                   | Removes it again                                                                 |
+| `devoke_installwatch`             | Stops recording installed files                                                  |
+| `invoke_installwatch`             | Starts recording again                                                           |
+| `add_priv_group group [opts]`     | Creates a system group, if it doesn't exist                                      |
+| `add_priv_user user:group [opts]` | Creates a system user and its group, if they don't exist                         |
 
-A typical Lunar module consists of several files:
+Files written while recording is stopped don't belong to the module, so `lrm` leaves them behind. Use that only for files that must survive a removal.
 
-- `DETAILS` - Module metadata (name, version, sources)
-- `DEPENDS` - Dependency declarations
-- `CATALYST` - Triggers that react to other modules being installed or removed
-- `CONFIGURE` - Configuration questions
-- `BUILD` - Build instructions
-- `PRE_BUILD` - Pre-build setup
-- `POST_INSTALL` - Post-installation tasks
+For new modules, create users and groups with a `sysusers.d` file instead of `add_priv_user` and `add_priv_group`: see [Module Directories](/docs/development/module-basics#module-directories).
 
-## Writing Custom Functions
+## Asking and Remembering
 
-Modules can define custom functions for complex build processes. These functions have access to the full Lunar function library.
+Used in CONFIGURE, and read back in BUILD or POST_INSTALL. Answers are saved per module, so the user is asked again only when they reconfigure it (`lin -r`). See [The CONFIGURE File](/docs/development/module-basics#the-configure-file).
 
-## Further Documentation
+| Function                                          | Does                                                                           |
+|---------------------------------------------------|--------------------------------------------------------------------------------|
+| `mquery VAR "question" y\|n [yes_opts] [no_opts]` | Asks once, saves `y` or `n` as `VAR`, and adds the matching options to `$OPTS` |
+| `query "question" y\|n`                           | Asks a yes/no question every time and returns true for yes                     |
+| `get_module_config VAR`                           | Prints the saved value of `VAR`                                                |
+| `set_module_config VAR value`                     | Saves a value                                                                  |
+| `unset_module_config VAR`                         | Forgets it, so `mquery` asks again                                             |
 
-For detailed information on writing modules, see:
+When nobody answers within `PROMPT_DELAY` seconds, `query` and `mquery` take the default.
 
-- [Module Writing Guide](/docs/development/module-writing)
-- [Module Basics](/docs/development/module-basics)
-- [Module Submission](/docs/development/module-submission)
+## Checking the System
 
-## Contributing
+Usable in any bash module file except DEPENDS.
 
-This reference is incomplete. Contributions are welcome! If you have experience with Lunar module development, please help expand this documentation.
+| Function                               | Does                                                                                      |
+|----------------------------------------|-------------------------------------------------------------------------------------------|
+| `module_installed module`              | True if `module` is installed (or held)                                                   |
+| `in_depends $MODULE dependency`        | True if the user chose `dependency` for this module (or it is a required one)             |
+| `installed_version module`             | Prints the installed version                                                              |
+| `module_version module`                | Prints the version in the moonbase                                                        |
+| `kernel_option_present OPTION [value]` | True if the running kernel's configuration has `OPTION` set to `y` or `m` (or to `value`) |
 
-## Source Code
+Use `in_depends` rather than `module_installed` to test an optional dependency: a module can be installed without the user having chosen it for this one. wget's BUILD picks its TLS library that way:
 
-The actual function implementations can be found in the Lunar source code:
+```bash
+# /var/lib/lunar/moonbase/ftp/wget/BUILD (excerpt)
+if in_depends $MODULE openssl || in_depends $MODULE libressl; then
+```
 
-- `/var/lib/lunar/functions` - Core functions
-- `/var/lib/lunar/plugins` - Plugin functions
+`kernel_option_present` returns 255 when it can't find a kernel configuration, so test for that before treating a false result as "not set".
 
-You can examine these files directly for the most up-to-date function definitions and usage examples.
+## Messages
+
+| Function              | Does                                        |
+|-----------------------|---------------------------------------------|
+| `message text...`     | Prints text, unless Lunar runs silently     |
+| `verbose_msg text...` | Prints text only in verbose mode (`lin -v`) |
+
+`message` understands the escape sequences of `echo -e`, and the color variables Lunar uses, such as `${MESSAGE_COLOR}` and `${DEFAULT_COLOR}`.
+
+## Variables
+
+Set by Lunar while it runs a module's files:
+
+| Variable                                     | Holds                                                                                                      |
+|----------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| `MODULE`, `VERSION`                          | The module's name and version, from DETAILS                                                                |
+| `SOURCE`, `SOURCE2`, ...                     | The source file names, from DETAILS                                                                        |
+| `SOURCE_DIRECTORY`                           | Where the source is unpacked; default `$BUILD_DIRECTORY/$MODULE-$VERSION`                                  |
+| `BUILD_DIRECTORY`                            | The parent of all source directories, `/usr/src`                                                           |
+| `SOURCE_CACHE`                               | Where downloads are kept, `/var/spool/lunar`                                                               |
+| `SCRIPT_DIRECTORY`                           | The module's own directory in the moonbase, for files shipped with the module                              |
+| `MODULE_PREFIX`                              | The install prefix, `/usr` unless DETAILS sets it                                                          |
+| `OPTS`                                       | Build options collected from DEPENDS, CONFIGURE and `lin --opts`                                           |
+| `PLATFORM`                                   | The machine type, as in `DETAILS.x86_64`                                                                   |
+| `CATALYST_MODULE`, `CATALYST_MODULE_VERSION` | During a [CATALYST](/docs/development/module-basics#the-catalyst-file) trigger: the module that set it off |
+
+Add to `OPTS` with `OPTS+=" --option"`, so the options from DEPENDS and CONFIGURE are kept.
+
+Since the module files are bash, a BUILD can also define its own shell functions when it repeats itself.
+
+## Reading the Source
+
+The functions live in `/var/lib/lunar/functions` and `/var/lib/lunar/plugins` on an installed system, and in `libs/` and `plugins/` of the [lunar repository](https://github.com/lunar-linux/lunar). Most of them start with a comment that gives their usage. Other functions you find there are Lunar's own internals and can change, so modules shouldn't rely on them.
 
 ## See Also
 
-- [Module Writing Guide](/docs/development/module-writing)
-- [Module Basics](/docs/development/module-basics)
-- [Package Management](/docs/package-management/)
+- [Module Basics](/docs/development/module-basics) - Every module file and option
+- [Writing Modules](/docs/development/module-writing) - Creating a new module, step by step
+- [Module Submission](/docs/development/module-submission) - Updating modules and sending them to the moonbase
