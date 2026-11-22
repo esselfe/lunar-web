@@ -1,226 +1,207 @@
 ---
 title: "Writing Modules"
-description: "Learn how to create new modules for the Lunar Linux moonbase"
+description: "A walkthrough of creating a new module for the Lunar Linux moonbase, from DETAILS to a tested build"
 category: "development"
-tags: ["modules", "development", "writing", "creating"]
-lastUpdated: 2025-11-02
+tags: ["modules", "development", "writing", "creating", "llint"]
+lastUpdated: 2026-11-22
 order: 2
 ---
 
-Writing Lunar modules can be extremely complex or very simple, and is analogous to performing the steps needed to install a package manually. However, there are many variables you need to think of when writing modules, so it's hard to get them all right if you're new at writing modules.
+Writing a module is writing down the steps you would take to install a piece of software by hand: where to download it, what it needs, and how to build it. Lunar has a default for most of those steps, so a module for well-behaved software is often just two short files.
+
+This page walks through one module from start to finish, Lunar's `pamixer` module, a small command-line volume mixer built with meson. [Module Basics](/docs/development/module-basics) is the reference for every file and option; this page links to it rather than repeating it.
 
 ## Before You Start
 
-Take some time to think about why you want to make a new module. Also, there might be things to consider that would prevent you from writing a module at all. Here are some quick guidelines:
-
-### Check if the Package Already Exists
-
-Nothing is worse than doing the same work twice.
+### Check the Module Doesn't Exist
 
 ```bash
-# Search the moonbase for existing modules
-lvu search packagename
+# Search module names
+lvu apropos pamixer
 
-# List all modules
-lvu section all
+# Search the module descriptions
+lvu search "volume mixer"
 ```
 
-### Check Dependencies
+If it exists but is out of date or broken, fix it instead of writing a new one: see [Module Submission](/docs/development/module-submission) for `lvu edit`.
 
-See if the dependencies required for the module also meet these requirements. Sometimes a module might take so much time to write that it's not worth it.
+### Is a Module Worth It?
 
-### Consider Alternatives
+Look at what the software needs. If its dependencies aren't in the moonbase either, you are signing up for writing those modules too. Some software is easier to install in your home directory, or ships as a single binary that needs no build at all.
 
-Check if you're not better off installing it manually or using a binary. Plenty of packages are so easy to install into your home directory that even though a module would be nice, it's often just easier to install it manually.
+## 1. Create the Module
 
-## Starting the Module
+Your own modules go in the `zlocal` section of the moonbase, `/var/lib/lunar/moonbase/zlocal/`, where a moonbase update won't touch them. Lunar finds new modules there without any setting.
 
-There are two ways to create a new module:
-
-### Quick and Dirty Way
-
-The quick way to create a module is by using `lvu`.
+The quickest start is `lvu new`:
 
 ```bash
-# Create a new module
-lvu new mymodule
+lvu new pamixer
 ```
 
-This will:
-1. Prompt you for information using cut and paste
-2. Create the directory in zlocal
-3. Create the DETAILS file
+(pamixer is already in the moonbase, so on your machine `lvu new` refuses that name and points you to `lvu edit`. Use the name of the software you are packaging.)
 
-Now verify the module:
+It asks for the download URL, a one-line summary, the website and a longer description. Then it downloads the source into `/var/spool/lunar`, guesses `VERSION` from the file name and writes `zlocal/pamixer/DETAILS`. Treat the result as a draft:
+
+- It writes a `sha1:` checksum. Replace it with sha256 (see step 3).
+- It leaves no blank line before `cat << EOF`. `llint --fix` adds it (see step 4).
+- For downloads where the file name isn't the module's name, such as GitHub's `archive/1.6.tar.gz`, it names the file just `1.6.tar.gz`. Switch to `SOURCE_URL_FULL` (see step 2).
+
+You can just as well create the directory and the file yourself:
 
 ```bash
-# Change to the module directory
-lvu cd mymodule
-
-# Check the DETAILS file
-cat DETAILS
+mkdir /var/lib/lunar/moonbase/zlocal/pamixer
+cd /var/lib/lunar/moonbase/zlocal/pamixer
 ```
 
-At this point you should verify that the DETAILS file looks correct.
+`lvu cd pamixer` takes you to a module's directory from anywhere.
 
-### Normal Way
+## 2. Write DETAILS
 
-Find a good spot in the moonbase. You should always work in the **zlocal** section. Your system moonbase is located in `/var/lib/lunar/moonbase`.
-
-```bash
-cd /var/lib/lunar/moonbase/zlocal
-mkdir mymodule
-cd mymodule
-```
-
-Every module is defined as the group of files and directories including a DETAILS file in a directory. So we need a DETAILS file:
+DETAILS says what the software is and where to download it. This is pamixer's:
 
 ```bash
-          MODULE=mymodule
-         VERSION=1.0
-          SOURCE=$MODULE-$VERSION.tar.bz2
-      SOURCE_URL=http://my.site.org/files/
-      SOURCE_VFY=sha1:e96df66f703c5ab1a295e216b5035ee14d6202b2
-        WEB_SITE=http://my.site.org/
-         ENTERED=20050808
-         UPDATED=20050808
-           SHORT="Makes module writing easy"
+# /var/lib/lunar/moonbase/audio/pamixer/DETAILS
+          MODULE=pamixer
+         VERSION=1.6
+          SOURCE=$MODULE-$VERSION.tar.gz
+ SOURCE_URL_FULL=https://github.com/cdemoulins/pamixer/archive/$VERSION.tar.gz
+      SOURCE_VFY=sha256:8b7199e495dc19b190f8f02ace8782f533266a4bd7c7d3cf6f4cf09b2de13e71
+        WEB_SITE=https://github.com/cdemoulins/pamixer/
+            TYPE=meson
+         ENTERED=20190403
+         UPDATED=20220613
+           SHORT="Pulseaudio command-line mixer like amixer"
 
-cat<<EOF
-MyModule is a simple tool to explain module writing in
-detail. It doesn't actually exist but is used as an example
-for educational purposes.
+cat << EOF
+pamixer is like amixer but for pulseaudio.
+It can control the volume levels of the sinks.
+Also, this project can provide you a small C++ library to control pulseaudio.
+Features:
+ - Get the current volume of the default sink, the default source or a selected
+   one by his id
+ - Set the volume for the default sink, the default source or any other device
+ - List the sinks
+ - List the sources
+ - Increase / Decrease the volume for a device (using gamma correction
+   optionally)
+ - Mute or unmute a device.
 EOF
 ```
 
-This is a basic DETAILS file with all required components. As you can see it's just plain shell code.
+What to notice:
 
-**Important:** All Lunar module files are bash code. This means that you should pay special attention to shell meta characters and proper syntax.
+- **The download.** GitHub serves the release as `archive/1.6.tar.gz`, so the module gives the whole URL in `SOURCE_URL_FULL` and saves it under the name in `SOURCE`. For an ordinary download directory, use `SOURCE_URL` instead and Lunar adds `$SOURCE` to it. See [Source URLs](/docs/development/module-basics#source-urls) and the [mirror variables](/docs/development/module-basics#mirror-variables) such as `$GNU_URL`.
+- **`$MODULE` and `$VERSION`** are used instead of writing them out, so the next version bump only changes `VERSION`, `SOURCE_VFY` and `UPDATED`.
+- **`TYPE=meson`** picks Lunar's meson build, so the module needs no BUILD file. Leave `TYPE` out for software built with `./configure`. Step 5 has the details.
+- **`ENTERED` and `UPDATED`** are both today's date (`yyyymmdd`) in a new module.
+- **No `SOURCE_DIRECTORY`**, because the tarball unpacks into `pamixer-1.6/`, the default `$MODULE-$VERSION`. Check with `tar tf /var/spool/lunar/pamixer-1.6.tar.gz | head -1`; if it unpacks anywhere else, set [`SOURCE_DIRECTORY`](/docs/development/module-basics#optional-details-fields).
 
-This DETAILS file already can be all you need for writing a module, depending on the way "mymodule" needs to be compiled.
+Every field is described under [The DETAILS File](/docs/development/module-basics#the-details-file). DETAILS is bash, sourced by Lunar, so quote anything with spaces and use `cat << 'EOF'` if the description contains `` ` `` or `$`.
 
-## Module Format
+## 3. Get the Checksum
 
-See [Module Basics](/docs/development/module-basics) for detailed information about the module files and module examples.
-
-## Creating the DETAILS File
-
-The DETAILS file is the heart of every module. It contains essential information about the package.
-
-### Required Fields
+Download the source with `lget`, then compute the checksum of the file you got:
 
 ```bash
-MODULE=mymodule              # The name of the module
-VERSION=1.0                  # The version number
-SOURCE=$MODULE-$VERSION.tar.bz2  # Source filename
-SOURCE_URL=http://...        # Where to download from
-SOURCE_VFY=sha1:...         # SHA1 checksum for verification
-WEB_SITE=http://...         # Project website
-ENTERED=20050808            # Date module was created
-UPDATED=20050808            # Date module was last updated
-SHORT="short description"    # One-line description
+lget pamixer
+sha256sum /var/spool/lunar/pamixer-1.6.tar.gz
 ```
 
-### Long Description
-
-After the required fields, include a longer description:
+Put it in DETAILS with a `sha256:` prefix:
 
 ```bash
-cat<<EOF
-This is a longer description of what the module does.
-It can span multiple lines and provides more detail
-about the package's functionality.
-EOF
+      SOURCE_VFY=sha256:8b7199e495dc19b190f8f02ace8782f533266a4bd7c7d3cf6f4cf09b2de13e71
 ```
 
-## Adding Dependencies
+Never copy a checksum from somewhere else, and don't leave the prefix out or misspell it. See [Checksums](/docs/development/module-basics#checksums).
 
-If your module requires other modules, create a DEPENDS file:
+## 4. Lint It
+
+`llint`, from the `lunar-tools` module, checks a module against the moonbase's rules: the `=` signs in one column, the blank line before `cat << EOF`, the required fields, valid dates, `MODULE` matching the directory name, and DEPENDS containing only dependency calls. Every pull request to the moonbase is checked with it, so run it as you go:
 
 ```bash
-# /var/lib/lunar/moonbase/zlocal/mymodule/DEPENDS
-
-# Required dependencies
-depends gcc
-depends make
-
-# Optional dependencies
-optional_depends "gtk+" \
-                 "--with-gtk" \
-                 "--without-gtk" \
-                 "for GUI support"
+llint pamixer
 ```
 
-## Creating a BUILD File
-
-If the default build process doesn't work, create a BUILD file:
+`llint` looks in zlocal first. Most layout problems it can fix for you:
 
 ```bash
-# /var/lib/lunar/moonbase/zlocal/mymodule/BUILD
-
-./configure --prefix=/usr \
-            --sysconfdir=/etc \
-            $OPTS &&
-
-make &&
-prepare_install &&
-make install
+llint --fix --verbose pamixer
 ```
 
-### Important BUILD Notes
+## 5. Look at the Build System
 
-- Use `&&` to chain commands together
-- Call `prepare_install` before `make install`
-- The `prepare_install` function tells the package manager to start tracking files
+Unpack the source somewhere and look at how it builds. The file at the top tells you which default build to use:
 
-## Testing Your Module
+| File in the source          | In DETAILS                                       |
+|-----------------------------|--------------------------------------------------|
+| `configure`                 | nothing, the default                             |
+| `meson.build`               | `TYPE=meson`                                     |
+| `CMakeLists.txt`            | `TYPE=cmake`                                     |
+| `Makefile.PL` or `Build.PL` | `TYPE=perl`                                      |
+| only a `Makefile`           | usually a BUILD file that sets `PREFIX` (step 7) |
+| something else              | a BUILD file (step 7)                            |
 
-Once you've created your module files:
+Source from a git checkout often has a `configure.ac` but no `configure` yet; that needs a short BUILD that runs `./autogen.sh` first. [Default Build Process](/docs/development/module-basics#default-build-process) shows what each default runs.
 
-```bash
-# Test downloading the source
-lget mymodule
+The build files also list what the software needs. pamixer's `meson.build` has two dependencies:
 
-# Try building the module
-lin mymodule
-
-# Check what files were installed
-lvu install mymodule
-
-# Check for broken dependencies
-lvu links mymodule
+```text
+pulse = dependency('libpulse')
+cxxopts = dependency('cxxopts')
 ```
 
-## Common Pitfalls
+Its build options, if it has any, are in `meson_options.txt` (`configure --help` for autotools, `option()` in `CMakeLists.txt` for cmake). Those are where optional dependencies come from.
 
-### Incorrect SOURCE_VFY
+## 6. Write DEPENDS
 
-Always generate the correct SHA1 checksum:
+Each dependency of the build becomes a module in DEPENDS. The name the build asks for isn't always the module's name: `libpulse` comes from the `pulseaudio` module. On a machine where it is installed, `lvu from` finds the module that owns a file:
 
 ```bash
-sha1sum /var/spool/lunar/mymodule-1.0.tar.bz2
+lvu from /usr/lib/pkgconfig/libpulse.pc
 ```
 
-Then copy that into your DETAILS file.
-
-### Missing Dependencies
-
-Make sure to declare all dependencies. Use these commands to help identify them:
+Add the build tools the module needs too, since Lunar has no separate list for them. The toolchain every system has (gcc, make, glibc, bash) is left out. For pamixer that gives:
 
 ```bash
-# Show what libraries a binary needs
-ldd /usr/bin/mybinary
-
-# Find what module provides a file
-lvu where /usr/lib/libsomething.so
+depends meson
+depends cxxopts
+depends pulseaudio
 ```
 
-### Improper Use of prepare_install
-
-Only call `prepare_install` immediately before installing files:
+When a build option turns a feature on or off, make it an optional dependency, and the user is asked. Lunar's `foot` module, a Wayland terminal, does this for its utmp logging:
 
 ```bash
-# WRONG
+# /var/lib/lunar/moonbase/wayland/foot/DEPENDS (excerpt)
+optional_depends libutempter "-Dutmp-backend=libutempter" "-Dutmp-backend=none" \
+        "for utmp logging backend"
+```
+
+The second and third arguments are added to `$OPTS` when the user says yes or no, and the build passes `$OPTS` to meson (or `./configure`, or cmake). Write them in the build system's own syntax.
+
+DEPENDS can only contain these calls, no `if` or other bash. [The DEPENDS File](/docs/development/module-basics#the-depends-file) covers the defaults, choosing one of several modules, aliases such as `%SSL` and cyclic dependencies.
+
+## 7. Write BUILD, Only If You Need It
+
+pamixer has no BUILD file: `TYPE=meson` does everything. Write one only when the default doesn't work. Most BUILD files add an option and then call the default:
+
+```bash
+# /var/lib/lunar/moonbase/net/iputils/BUILD
+OPTS+=" -DBUILD_MANS=false \
+        -DBUILD_HTML_MANS=false"
+
+default_meson_build
+```
+
+Software without a build system is built by hand. Then the rules are:
+
+- Join the commands with `&&`, so the build stops at the first failure.
+- Call `prepare_install` right before anything is installed. It removes the old version and starts recording the files the module installs. Anything installed before it isn't recorded, so `lrm` can't remove it.
+- Install straight into `/`, not into a `DESTDIR`.
+
+```bash
+# WRONG: the build runs after prepare_install has removed the old version
 prepare_install &&
 make &&
 make install
@@ -231,103 +212,59 @@ prepare_install &&
 make install
 ```
 
-## Best Practices
+[The BUILD File](/docs/development/module-basics#the-build-file) has more examples. To change the source before it builds, there is PRE_BUILD, and patches go in the module's `patch.d` directory: see [The PRE_BUILD File](/docs/development/module-basics#the-pre_build-file).
 
-### Use Shell Variables
-
-Take advantage of predefined variables:
+## 8. Build and Test It
 
 ```bash
-$MODULE              # Module name
-$VERSION             # Module version
-$SOURCE_DIRECTORY    # Where source was unpacked
-$BUILD_DIRECTORY     # Usually /usr/src
-$OPTS               # Options from CONFIGURE
+lin pamixer
 ```
 
-### Follow Conventions
-
-- Use lowercase for module names
-- Use descriptive SHORT descriptions
-- Update the UPDATED field only when compile behavior changes
-- Test thoroughly before submitting
-
-### Document Your Changes
-
-If you're modifying an existing module, document why:
+`lin` asks the optional dependency questions, builds whatever dependencies are missing, downloads and checks the source, and builds and installs the module. If the build fails, read the log:
 
 ```bash
-# In the DETAILS file
-# Updated to fix compilation with gcc 11
-UPDATED=20231102
+lvu compile pamixer
 ```
 
-## Advanced Topics
+After you change DEPENDS, run `lin -r pamixer` to answer the questions again; without `-r` Lunar keeps the earlier answers.
 
-### Multiple Sources
-
-If your module needs multiple source files:
+When it has built, check the result:
 
 ```bash
-SOURCE=$MODULE-$VERSION.tar.gz
-SOURCE2=$MODULE-docs-$VERSION.tar.gz
-SOURCE_URL=http://example.com/
-SOURCE2_URL=http://docs.example.com/
-SOURCE_VFY=sha1:...
-SOURCE2_VFY=sha1:...
+# Every file the module installed: look for anything outside /usr and /etc,
+# or anything that shouldn't be there at all
+lvu install pamixer
+
+# The modules whose libraries pamixer's programs use: each one should be
+# in DEPENDS, or come with the toolchain
+lvu links pamixer
+
+# Run the program
+pamixer --get-volume
+
+# Removing it should take all of its files with it
+lrm pamixer
 ```
 
-Then in your PRE_BUILD:
+`lvu links` catches the most common mistake: a library that was already installed on your machine, so the build found it, but that DEPENDS doesn't mention. On someone else's machine that build fails, or quietly builds without the feature.
 
-```bash
-unpack $SOURCE &&
-cd $SOURCE_DIRECTORY &&
-unpack $SOURCE2
-```
+Run `llint pamixer` once more after your last change.
 
-### Patches
+## Common Mistakes
 
-If you need to apply patches, use PRE_BUILD:
-
-```bash
-# PRE_BUILD
-default_pre_build &&
-patch_it $SOURCE_CACHE/$SOURCE2 1
-```
-
-Where `$SOURCE2` is the patch file listed in DETAILS.
-
-### Platform-Specific Builds
-
-For 64-bit specific settings, create:
-- `DETAILS.x86_64`
-- `BUILD.x86_64`
-
-These will override the default files on 64-bit systems.
+- **Checksum mismatch.** The file in `/var/spool/lunar` isn't the one the checksum was made from. When a download stops matching without a new version, find out why before you change `SOURCE_VFY`: some sites regenerate their archive downloads, but a changed file can also have been tampered with.
+- **A dependency your machine happens to have.** See `lvu links` above. Read the build files rather than trusting that it built.
+- **Changing `UPDATED` for a cosmetic change.** `UPDATED` tells users to rebuild. Change it for a new version or anything that changes the build, not for tidying the file.
+- **Doing too much in POST_INSTALL.** Users and groups belong in `sysusers.d`, services in `systemd.d`, and rebuilding another module after this one in a [CATALYST](/docs/development/module-basics#the-catalyst-file) file. See [Module Directories](/docs/development/module-basics#module-directories).
 
 ## Next Steps
 
-Once you have a working module:
+When the module builds, installs, works and removes cleanly, and `llint` is happy, send it to the moonbase: [Module Submission](/docs/development/module-submission) explains the repositories, the pull request and the review.
 
-1. Test it thoroughly
-2. Check for any warnings during compilation
-3. Verify all files are installed correctly
-4. Test removal with `lrm mymodule`
-5. Consider submitting it to the moonbase
+To go further:
 
-See [Module Submission](/docs/development/module-submission) for information on contributing your module back to the community.
+- [Module Basics](/docs/development/module-basics): every module file and option, the module directories, CATALYST, and platform variants such as `DETAILS.x86_64`
+- [Module Functions](/docs/development/module-functions): the functions available in module files
+- [Moonbase](/docs/package-management/moonbase): how the moonbase is organised
 
-## Resources
-
-- [Module Basics](/docs/development/module-basics) - Detailed documentation of the module files
-- [Module Functions](/docs/development/module-functions) - Available function reference
-- [Moonbase](/docs/package-management/moonbase) - Understanding the repository structure
-
-## Getting Help
-
-If you need help writing modules:
-- Join #lunar on irc.libera.chat
-- Ask on the [Lunar mailing lists](http://lists.lunar-linux.org/cgi-bin/mailman/listinfo)
-- Check existing modules for examples
-
-Remember: The best way to learn is by examining existing modules in the moonbase!
+The moonbase has thousands of modules: when you are unsure how to do something, find a module that builds the same way and see how it does it. `grep -l 'TYPE=cmake' /var/lib/lunar/moonbase/*/*/DETAILS` lists the cmake modules, for example. For help, ask in #lunar on irc.libera.chat.

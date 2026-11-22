@@ -107,11 +107,11 @@ Or manually change into the directory given by `lvu edit`.
    ```
 4. Generate the new checksum:
    ```bash
-   sha1sum /var/spool/lunar/theModule-(whatever the new file name is)
+   sha256sum /var/spool/lunar/theModule-(whatever the new file name is)
    ```
-5. Insert this checksum in the SOURCE_VFY field in the DETAILS file
+5. Insert this checksum in the SOURCE_VFY field in the DETAILS file, after `sha256:`
 
-#### If You Are Correcting a Broken Link or SHA1sum Without Changing the Version:
+#### If You Are Correcting a Broken Link or Checksum Without Changing the Version:
 
 Leave the UPDATED field as it was so that people will not be forced to download and re-install.
 
@@ -282,7 +282,7 @@ Test the build process thoroughly. Common issues:
 Always generate fresh checksums:
 
 ```bash
-sha1sum /var/spool/lunar/theModule-x.y.z.tar.gz
+sha256sum /var/spool/lunar/theModule-x.y.z.tar.gz
 ```
 
 ## Advanced Submissions
@@ -293,8 +293,8 @@ If your module requires multiple source files:
 
 ```bash
 SOURCE2=$MODULE-docs-$VERSION.tar.gz
-SOURCE2_URL=http://example.com/
-SOURCE2_VFY=sha1:...
+SOURCE2_URL=https://example.com/
+SOURCE2_VFY=sha256:...
 ```
 
 ### Platform-Specific Changes
