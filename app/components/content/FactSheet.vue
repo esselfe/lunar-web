@@ -20,7 +20,7 @@
         :key="fact.label"
         class="border-t border-white/10 py-3.5"
       >
-        <dt class="text-xs font-medium tracking-wide text-gray-500 uppercase">
+        <dt class="text-xs font-medium tracking-wide text-gray-450 uppercase">
           {{ fact.label }}
         </dt>
         <dd class="mt-1 text-gray-100">

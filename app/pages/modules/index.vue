@@ -31,7 +31,7 @@
         <div class="relative min-w-0 flex-1 basis-72">
           <Icon
             name="ph:magnifying-glass"
-            class="pointer-events-none absolute top-1/2 left-3.5 h-5 w-5 -translate-y-1/2 text-gray-500"
+            class="pointer-events-none absolute top-1/2 left-3.5 h-5 w-5 -translate-y-1/2 text-gray-450"
           />
           <input
             id="module-search"
@@ -41,7 +41,7 @@
             autocomplete="off"
             spellcheck="false"
             :placeholder="overview.total ? `Search ${overview.total.toLocaleString('en-US')} modules` : 'Search modules'"
-            class="w-full rounded-lg border border-white/10 bg-gray-900 py-3 pr-4 pl-11 text-white placeholder:text-gray-500 focus:border-indigo-400 focus:outline-none"
+            class="w-full rounded-lg border border-white/10 bg-gray-900 py-3 pr-4 pl-11 text-white placeholder:text-gray-450 focus:border-indigo-400 focus:outline-none"
           >
         </div>
         <button
@@ -124,7 +124,7 @@
             >
               <span class="flex items-baseline justify-between gap-3">
                 <span class="font-semibold text-white group-hover:text-indigo-200">{{ section.name }}</span>
-                <span class="text-sm text-gray-500 tabular-nums">{{ section.count }}</span>
+                <span class="text-sm text-gray-450 tabular-nums">{{ section.count }}</span>
               </span>
               <span class="block truncate text-sm text-gray-400">{{ section.highlights.join(', ') }}</span>
             </NuxtLink>

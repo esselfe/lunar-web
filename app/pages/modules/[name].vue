@@ -64,7 +64,7 @@
       <!-- Facts -->
       <dl class="mt-14 grid grid-cols-1 gap-x-10 gap-y-5 border-y border-white/10 py-8 text-sm sm:grid-cols-2 lg:grid-cols-3">
         <div v-if="isUrl(module.website)">
-          <dt class="text-gray-500">
+          <dt class="text-gray-450">
             Website
           </dt>
           <dd class="mt-1 truncate">
@@ -75,7 +75,7 @@
           </dd>
         </div>
         <div v-if="isUrl(module.source)">
-          <dt class="text-gray-500">
+          <dt class="text-gray-450">
             Source
           </dt>
           <dd class="mt-1 truncate">
@@ -86,7 +86,7 @@
           </dd>
         </div>
         <div>
-          <dt class="text-gray-500">
+          <dt class="text-gray-450">
             In the moonbase
           </dt>
           <dd class="mt-1">
@@ -97,7 +97,7 @@
           </dd>
         </div>
         <div v-if="module.entered">
-          <dt class="text-gray-500">
+          <dt class="text-gray-450">
             Joined the moonbase
           </dt>
           <dd class="mt-1 text-gray-200">
@@ -105,7 +105,7 @@
           </dd>
         </div>
         <div v-if="module.lastChange">
-          <dt class="text-gray-500">
+          <dt class="text-gray-450">
             Last change
           </dt>
           <dd class="mt-1 text-gray-200">
@@ -117,7 +117,7 @@
           </dd>
         </div>
         <div v-if="extras.length">
-          <dt class="text-gray-500">
+          <dt class="text-gray-450">
             Also
           </dt>
           <dd class="mt-1 text-gray-200">
@@ -186,7 +186,7 @@
                 </span>
                 <span
                   v-if="question.default !== null"
-                  class="shrink-0 text-xs text-gray-500"
+                  class="shrink-0 text-xs text-gray-450"
                 >default {{ question.default ? 'yes' : 'no' }}</span>
               </li>
             </ol>
@@ -215,7 +215,7 @@
                   <span class="truncate text-sm text-gray-400">{{ change.author }}</span>
                   <time
                     :datetime="change.date"
-                    class="text-sm text-gray-500 tabular-nums"
+                    class="text-sm text-gray-450 tabular-nums"
                   >{{ formatDate(change.date) }}</time>
                 </a>
               </li>
@@ -260,7 +260,7 @@
                 </template>
                 <template v-else-if="dependency.missing">
                   <span class="font-semibold text-gray-300">{{ dependency.module }}</span>
-                  <span class="text-sm text-gray-500"> not in the moonbase</span>
+                  <span class="text-sm text-gray-450"> not in the moonbase</span>
                 </template>
                 <NuxtLink
                   v-else
@@ -275,7 +275,7 @@
                 </NuxtLink>
                 <span
                   v-if="dependency.conditional"
-                  class="text-xs text-gray-500"
+                  class="text-xs text-gray-450"
                 > (only in some setups)</span>
               </li>
             </ol>
@@ -312,7 +312,7 @@
         </div>
       </div>
 
-      <p class="mt-16 text-sm text-gray-500">
+      <p class="mt-16 text-sm text-gray-450">
         From the moonbase index of {{ formatDate(generatedAt) }}.
         <a
           :href="folderUrl"

@@ -35,7 +35,7 @@
         </p>
         <p
           v-if="page.lastUpdated"
-          class="mt-4 text-sm text-gray-500"
+          class="mt-4 text-sm text-gray-450"
         >
           Last updated: {{ formatDate(page.lastUpdated) }}
         </p>

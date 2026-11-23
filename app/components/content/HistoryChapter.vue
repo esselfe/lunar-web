@@ -18,7 +18,7 @@
     <div class="min-w-0 [&_h2]:mt-2 [&_h2]:mb-5">
       <p class="not-prose text-sm">
         <span class="font-medium text-indigo-200">{{ moonPhaseName(moonPhase) }}</span>
-        <span class="text-gray-500"> · {{ when }}</span>
+        <span class="text-gray-450"> · {{ when }}</span>
       </p>
       <slot />
     </div>

@@ -34,7 +34,7 @@
         </span>
         <span
           class="text-[0.7rem] tabular-nums"
-          :class="year.year === busiest.year ? 'font-semibold text-indigo-200' : 'text-gray-500'"
+          :class="year.year === busiest.year ? 'font-semibold text-indigo-200' : 'text-gray-450'"
         >{{ year.year }}<span class="sr-only">: {{ year.label }} changes</span></span>
       </li>
     </ol>
@@ -53,7 +53,7 @@
         busier
       </span>
       <span>Busiest: {{ busiest.year }}, with {{ busiest.label }} changes</span>
-      <span class="text-gray-500">{{ firstYear }} starts in August; {{ lastYear }} runs to {{ formatDate(asOf) }}</span>
+      <span class="text-gray-450">{{ firstYear }} starts in August; {{ lastYear }} runs to {{ formatDate(asOf) }}</span>
     </figcaption>
   </figure>
 </template>

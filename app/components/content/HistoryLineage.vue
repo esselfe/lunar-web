@@ -11,7 +11,7 @@
         <span class="font-semibold text-gray-200 sm:block">{{ root }}</span>
         <span
           v-if="rootWhen"
-          class="text-gray-500"
+          class="text-gray-450"
         ><span class="sm:hidden"> · </span>{{ rootWhen }}</span>
       </p>
 

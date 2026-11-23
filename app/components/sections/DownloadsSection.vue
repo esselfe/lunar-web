@@ -101,7 +101,7 @@
       </ol>
 
       <div class="mt-14 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/10 pt-6 text-sm">
-        <span class="text-gray-500">Also available</span>
+        <span class="text-gray-450">Also available</span>
         <a
           href="https://github.com/lunar-linux"
           class="text-gray-300 transition-colors hover:text-white"

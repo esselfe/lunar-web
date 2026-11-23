@@ -11,7 +11,7 @@
       >
         <span class="truncate font-semibold text-white group-hover:text-indigo-200">{{ module.name }}</span>
         <span
-          class="truncate text-right text-sm text-gray-500 tabular-nums"
+          class="truncate text-right text-sm text-gray-450 tabular-nums"
           :class="{ 'sm:text-left': !compact }"
         >{{ module.version ?? '' }}</span>
         <span

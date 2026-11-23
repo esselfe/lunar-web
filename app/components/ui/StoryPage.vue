@@ -64,6 +64,6 @@ defineProps<{
 
 .story :deep(> h2:last-of-type ~ p) {
   font-size: 0.9375rem;
-  color: var(--color-gray-500);
+  color: var(--color-gray-450);
 }
 </style>

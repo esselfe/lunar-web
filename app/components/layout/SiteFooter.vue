@@ -15,7 +15,7 @@
           </p>
           <!-- Tonight's real moon phase; filled in by the browser (the static build would be stale).
                The line keeps its height while empty so nothing shifts. -->
-          <p class="mt-3 flex h-5 items-center justify-center gap-2 text-sm text-gray-500 md:justify-start">
+          <p class="mt-3 flex h-5 items-center justify-center gap-2 text-sm text-gray-450 md:justify-start">
             <template v-if="tonight">
               <MoonPhaseIcon
                 :phase="tonight.phase"

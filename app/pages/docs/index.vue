@@ -86,7 +86,7 @@
               <span class="font-medium text-indigo-300/80">{{ stage.label }}</span>
               <span
                 v-if="stage.visitedCount"
-                class="text-gray-500"
+                class="text-gray-450"
               >{{ stage.visitedCount }} of {{ stage.pages.length }} visited</span>
             </p>
             <h2 class="mt-1 text-2xl font-semibold tracking-tight text-white">
@@ -123,7 +123,7 @@
                       <span class="font-medium text-gray-100 group-hover/stop:text-white">{{ item.title }}</span>
                       <span
                         v-if="item.pageCount"
-                        class="text-xs text-gray-500"
+                        class="text-xs text-gray-450"
                       >{{ item.pageCount }} {{ item.pageCount === 1 ? 'page' : 'pages' }}</span>
                       <span
                         v-if="item.visited"
@@ -132,7 +132,7 @@
                     </span>
                     <span
                       v-if="item.description"
-                      class="mt-0.5 line-clamp-2 block text-sm text-gray-500"
+                      class="mt-0.5 line-clamp-2 block text-sm text-gray-450"
                     >{{ item.description }}</span>
                   </span>
                 </NuxtLink>
@@ -177,7 +177,7 @@
                 </span>
                 <span
                   v-if="trip.description"
-                  class="mt-0.5 line-clamp-2 block text-sm text-gray-500"
+                  class="mt-0.5 line-clamp-2 block text-sm text-gray-450"
                 >{{ trip.description }}</span>
               </span>
             </NuxtLink>

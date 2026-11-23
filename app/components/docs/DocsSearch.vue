@@ -14,7 +14,7 @@
       />
       <template v-if="!compact">
         <span>Search docs...</span>
-        <kbd class="ml-auto hidden rounded-sm border border-gray-700 bg-gray-800 px-2 py-0.5 text-xs text-gray-500 sm:inline-block">
+        <kbd class="ml-auto hidden rounded-sm border border-gray-700 bg-gray-800 px-2 py-0.5 text-xs text-gray-450 sm:inline-block">
           {{ shortcutLabel }}
         </kbd>
       </template>
@@ -58,12 +58,12 @@
                 :aria-expanded="results.length > 0"
                 :aria-controls="listboxId"
                 :aria-activedescendant="results.length ? optionId(activeIndex) : undefined"
-                class="flex-1 bg-transparent text-white outline-hidden placeholder:text-gray-500 [&::-webkit-search-cancel-button]:appearance-none"
+                class="flex-1 bg-transparent text-white outline-hidden placeholder:text-gray-450 [&::-webkit-search-cancel-button]:appearance-none"
                 @keydown="onInputKeydown"
               >
               <button
                 type="button"
-                class="text-gray-500 hover:text-gray-300"
+                class="text-gray-450 hover:text-gray-300"
                 aria-label="Close search"
                 @click="close"
               >
@@ -83,19 +83,19 @@
               </p>
               <p
                 v-else-if="isIndexing"
-                class="p-8 text-center text-gray-500"
+                class="p-8 text-center text-gray-450"
               >
                 Loading search index...
               </p>
               <p
                 v-else-if="!query.trim()"
-                class="p-8 text-center text-gray-500"
+                class="p-8 text-center text-gray-450"
               >
                 Type to search the documentation
               </p>
               <p
                 v-else-if="!results.length"
-                class="p-8 text-center text-gray-500"
+                class="p-8 text-center text-gray-450"
               >
                 No results for "{{ query }}"
               </p>
@@ -150,7 +150,7 @@
 
             <div
               v-if="results.length"
-              class="hidden items-center gap-4 border-t border-gray-800 px-4 py-2 text-xs text-gray-500 sm:flex"
+              class="hidden items-center gap-4 border-t border-gray-800 px-4 py-2 text-xs text-gray-450 sm:flex"
               aria-hidden="true"
             >
               <span><kbd class="search-kbd">↑</kbd> <kbd class="search-kbd">↓</kbd> to move</span>
