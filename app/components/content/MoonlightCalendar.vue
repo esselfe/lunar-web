@@ -33,8 +33,8 @@
           />
         </span>
         <span
-          class="text-[0.7rem] tabular-nums"
-          :class="year.year === busiest.year ? 'font-semibold text-indigo-200' : 'text-gray-450'"
+          class="text-xs tabular-nums sm:text-[0.8125rem]"
+          :class="year.year === busiest.year ? 'font-semibold text-indigo-200' : 'text-gray-400'"
         >{{ year.year }}<span class="sr-only">: {{ year.label }} changes</span></span>
       </li>
     </ol>

@@ -29,7 +29,7 @@
                prose-code:rounded prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-normal prose-code:text-indigo-200
                prose-pre:border prose-pre:border-white/10 prose-pre:bg-gray-900
                [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-inherit
-               prose-th:text-gray-200 prose-td:text-gray-300
+               prose-table:text-[1em] prose-th:text-gray-200 prose-td:text-gray-300
                [&_code::after]:content-none [&_code::before]:content-none"
       />
     </div>
