@@ -96,7 +96,7 @@ something real. Keep new work in this spirit.
   drawing itself, the docs trajectory, the board flapping into place, the constellation drawing in.
   Small rare surprises are welcome (the once-per-session shooting star).
 - **Readability first.** Inter is the typeface, except on the split-flap tiles: IBM Plex Mono
-  medium, so each letter fills its tile and words read as words (a proportional font in fixed
+  regular, so each letter fills its tile and words read as words (a proportional font in fixed
   tiles looks spaced out). Lists of links get one item per row with a short description; avoid card
   grids and "mushed" inline links.
 - **Fill the space, on every screen.** Check phone, tablet and desktop widths; components that scale
