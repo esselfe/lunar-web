@@ -20,7 +20,7 @@
         <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
           <a
             href="https://web.libera.chat/#lunar"
-            class="rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white shadow-lg shadow-indigo-950/50 transition-colors hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
+            class="rounded-lg bg-accent px-5 py-2.5 font-medium text-white shadow-lg shadow-indigo-950/50 transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
           >
             Open web chat
           </a>

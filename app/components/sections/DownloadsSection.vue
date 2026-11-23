@@ -42,7 +42,7 @@
           <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
             <a
               :href="featured?.href"
-              class="rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white shadow-lg shadow-indigo-950/50 transition-colors hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
+              class="rounded-lg bg-accent px-5 py-2.5 font-medium text-white shadow-lg shadow-indigo-950/50 transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
             >
               Download ISO ({{ featured?.arch }})
             </a>

@@ -12,6 +12,12 @@
      app.vue turns blue). This passes 4.5:1 on all of them, and on gray-800 (4.7:1). */
   --color-gray-450: oklch(66% 0.024 262);
 
+  /* Primary buttons. Tailwind 4's indigo-600 (chroma 0.26) was the only fully saturated colour on
+     the page; at 0.17 it sits with the moon's lavender and the indigo-300 links instead of
+     shouting over them. White text on it passes WCAG AA. */
+  --color-accent: oklch(52% 0.17 277);
+  --color-accent-hover: oklch(57% 0.17 277);
+
   --animate-fade-in: fade-in 0.2s ease-in-out;
 
   @keyframes fade-in {
