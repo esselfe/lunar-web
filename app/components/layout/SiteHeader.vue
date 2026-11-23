@@ -8,7 +8,7 @@
         aria-label="Lunar Linux home"
       >
         <img
-          src="~/assets/lunar_logo-01-full.svg"
+          src="~/assets/lunar_logo-01-full-dark.svg"
           alt="Lunar Linux"
           class="h-12 w-auto"
           width="150"
