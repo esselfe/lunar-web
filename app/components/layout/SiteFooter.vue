@@ -4,7 +4,7 @@
       <div class="flex flex-col items-center justify-between gap-8 md:flex-row md:items-start">
         <div class="text-center md:text-left">
           <img
-            src="~/assets/lunar_logo-01-full.svg"
+            src="~/assets/lunar_logo-01-full-dark.svg"
             alt="Lunar Linux"
             class="mx-auto mb-2 h-10 w-auto md:mx-0"
             width="120"
