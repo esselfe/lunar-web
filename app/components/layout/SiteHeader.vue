@@ -48,7 +48,7 @@
         <DocsSearch />
         <NuxtLink
           to="/download"
-          class="download-button rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-950/50 transition-colors hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
+          class="download-button rounded-lg bg-accent/20 px-4 py-2 text-sm font-medium text-indigo-200 ring-1 ring-indigo-300/45 ring-inset transition-colors hover:bg-accent/35 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
           :aria-current="current('/download')"
         >
           Download
@@ -110,7 +110,7 @@
         <li class="mt-2">
           <NuxtLink
             to="/download"
-            class="block rounded-lg bg-indigo-600 px-4 py-3 text-center font-medium text-white shadow-lg shadow-indigo-950/50 transition-colors hover:bg-indigo-500"
+            class="block rounded-lg bg-accent px-4 py-3 text-center font-medium text-white shadow-lg shadow-indigo-950/50 transition-colors hover:bg-accent-hover"
             :aria-current="current('/download')"
           >
             Download
