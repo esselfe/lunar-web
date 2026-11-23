@@ -2861,7 +2861,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/dpkg</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/dracut</loc>
@@ -3529,11 +3529,11 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/firefox</loc>
-    <lastmod>2026-11-21</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/firefox-bin</loc>
-    <lastmod>2026-11-15</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/firejail</loc>
@@ -4193,7 +4193,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/gh</loc>
-    <lastmod>2026-11-12</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/ghc</loc>
@@ -8089,7 +8089,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/libphonenumber</loc>
-    <lastmod>2026-10-27</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/libpipeline</loc>
@@ -8789,7 +8789,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/libzip</loc>
-    <lastmod>2025-05-28</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/libzmf</loc>
@@ -8885,7 +8885,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/linux-lts</loc>
-    <lastmod>2026-11-19</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/Linux-PAM</loc>
@@ -10129,7 +10129,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/netdata</loc>
-    <lastmod>2026-11-04</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/nethack</loc>
@@ -11705,7 +11705,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-babel</loc>
-    <lastmod>2026-06-18</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-backcall</loc>
@@ -11721,11 +11721,11 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-beniget</loc>
-    <lastmod>2026-03-03</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-brotlicffi</loc>
-    <lastmod>2024-02-18</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-bson</loc>
@@ -11941,7 +11941,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-incremental</loc>
-    <lastmod>2025-08-29</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-iniconfig</loc>
@@ -14453,7 +14453,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/sun-jdk</loc>
-    <lastmod>2026-10-27</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/sun-jdk8</loc>
