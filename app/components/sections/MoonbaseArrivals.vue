@@ -54,8 +54,8 @@
             <span class="show-md">Gate</span>
             <span class="show-md">Landed</span>
             <span class="show-lg">Crew</span>
-            <span class="show-md">Status</span>
-            <!-- Moonbase time, flapping every minute -->
+            <span class="show-md head-status">Status</span>
+            <!-- Moonbase time, flapping every minute. It sits over the Status column, right of the short label. -->
             <span class="board-clock">
               <span class="flaps"><span
                 v-for="(char, i) in clock"
@@ -131,11 +131,12 @@ type Cells = Record<ColumnKey, string>
 /*
  * Width of each column in tiles. Phones show module and version (plus the status light), tablets
  * add the gate, date and status (`show-md`), wide screens the crew (`show-lg`). The grid tracks
- * in the <style> block follow the same widths and order.
+ * in the <style> block follow the same widths and order. Module and version are as wide as the
+ * board allows: 16 tiles show 90% of moonbase module names in full, 10 tiles 99% of versions.
  */
 const COLUMNS: { key: ColumnKey, width: number, className?: string }[] = [
-  { key: 'module', width: 12 },
-  { key: 'version', width: 8 },
+  { key: 'module', width: 16 },
+  { key: 'version', width: 10 },
   { key: 'gate', width: 6, className: 'show-md' },
   { key: 'landed', width: 6, className: 'show-md' },
   { key: 'crew', width: 10, className: 'show-lg' },
@@ -343,8 +344,8 @@ onBeforeUnmount(() => {
      readable. */
   --tile: 0.66em;
   --gap: 0.05em;
-  --module: calc(12 * var(--tile) + 11 * var(--gap));
-  --version: calc(8 * var(--tile) + 7 * var(--gap));
+  --module: calc(16 * var(--tile) + 15 * var(--gap));
+  --version: calc(10 * var(--tile) + 9 * var(--gap));
   --gate: calc(6 * var(--tile) + 5 * var(--gap));
   --landed: calc(6 * var(--tile) + 5 * var(--gap));
   --crew: calc(10 * var(--tile) + 9 * var(--gap));
@@ -355,9 +356,10 @@ onBeforeUnmount(() => {
   padding: 0.5rem;
   /*
    * Font size = frame width ÷ the board's width in em (tiles + gaps + the last column), so the
-   * board fills its width on any screen without overflowing. Phones: module + version (≈ 16.6 em).
+   * board fills its width on any screen without overflowing. The last column only holds the status
+   * light (0.6em); the header clock overlaps the Status column. Phones: module + version (≈ 20.6 em).
    */
-  font-size: clamp(12px, calc((100cqi - 1.5rem) / 16.6), 25px);
+  font-size: clamp(12px, calc((100cqi - 1.5rem) / 20.6), 25px);
   /* Flapping only repaints the board */
   contain: layout paint;
 }
@@ -378,11 +380,11 @@ onBeforeUnmount(() => {
   display: none;
 }
 
-/* Tablets: + gate, landed, status and the clock (≈ 40.4 em) */
+/* Tablets: + gate, landed, status and the clock (≈ 38.5 em) */
 @media (min-width: 768px) {
   .board {
     padding: 1rem 1.25rem;
-    font-size: clamp(12px, calc((100cqi - 3.5rem) / 40.4), 25px);
+    font-size: clamp(12px, calc((100cqi - 3.5rem) / 38.5), 25px);
   }
 
   .board-row {
@@ -398,10 +400,10 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Wide screens: + crew (≈ 48.2 em) */
+/* Wide screens: + crew (≈ 46.3 em) */
 @media (min-width: 1024px) {
   .board {
-    font-size: clamp(12px, calc((100cqi - 3.5rem) / 48.2), 25px);
+    font-size: clamp(12px, calc((100cqi - 3.5rem) / 46.3), 25px);
   }
 
   .board-row {
@@ -427,14 +429,24 @@ onBeforeUnmount(() => {
   color: var(--color-gray-450);
 }
 
-/* Smaller labels, without changing the row's own size (the columns are sized in its em) */
+/* Labels smaller than the tiles, without changing the row's own size (the columns are sized in
+   its em). They scale with the board: about 14px at desktop width, never under 13px. */
 .board-head > span:not(.board-clock),
 .board-clock > span:last-child {
-  font-size: 0.75rem;
+  font-size: clamp(0.8125rem, 0.62em, 1rem);
+  font-weight: 500;
 }
 
-/* Shown from 768px (see above) */
+/* Shown from 768px (see above). The clock shares the Status column with its label, and runs into
+   the status light's column, so the rows don't keep a clock-wide column empty. */
+.board-head .head-status {
+  grid-row: 1;
+  grid-column: -3 / -2;
+}
+
 .board-clock {
+  grid-row: 1;
+  grid-column: -3 / -1;
   align-items: center;
   justify-self: end;
   gap: 0.4rem;
