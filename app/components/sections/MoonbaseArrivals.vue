@@ -339,9 +339,10 @@ onBeforeUnmount(() => {
 
 .board {
   /* One tile and the gap between tiles, in em so the whole board scales together. Columns are
-     sized in tiles so every row lines up. Narrow tiles and tight gaps keep words readable. */
-  --tile: 0.82em;
-  --gap: 0.06em;
+     sized in tiles so every row lines up. Tiles just wider than a monospace letter keep words
+     readable. */
+  --tile: 0.66em;
+  --gap: 0.05em;
   --module: calc(12 * var(--tile) + 11 * var(--gap));
   --version: calc(8 * var(--tile) + 7 * var(--gap));
   --gate: calc(6 * var(--tile) + 5 * var(--gap));
@@ -354,9 +355,9 @@ onBeforeUnmount(() => {
   padding: 0.5rem;
   /*
    * Font size = frame width ÷ the board's width in em (tiles + gaps + the last column), so the
-   * board fills its width on any screen without overflowing. Phones: module + version (≈ 20 em).
+   * board fills its width on any screen without overflowing. Phones: module + version (≈ 16.6 em).
    */
-  font-size: clamp(12px, calc((100cqi - 1.5rem) / 20), 22px);
+  font-size: clamp(12px, calc((100cqi - 1.5rem) / 16.6), 25px);
   /* Flapping only repaints the board */
   contain: layout paint;
 }
@@ -377,11 +378,11 @@ onBeforeUnmount(() => {
   display: none;
 }
 
-/* Tablets: + gate, landed, status and the clock (≈ 47.5 em) */
+/* Tablets: + gate, landed, status and the clock (≈ 40.4 em) */
 @media (min-width: 768px) {
   .board {
     padding: 1rem 1.25rem;
-    font-size: clamp(12px, calc((100cqi - 3.5rem) / 47.5), 21px);
+    font-size: clamp(12px, calc((100cqi - 3.5rem) / 40.4), 25px);
   }
 
   .board-row {
@@ -397,10 +398,10 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Wide screens: + crew (≈ 57 em) */
+/* Wide screens: + crew (≈ 48.2 em) */
 @media (min-width: 1024px) {
   .board {
-    font-size: clamp(12px, calc((100cqi - 3.5rem) / 57), 22px);
+    font-size: clamp(12px, calc((100cqi - 3.5rem) / 48.2), 25px);
   }
 
   .board-row {

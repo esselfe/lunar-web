@@ -135,7 +135,11 @@ export default defineNuxtConfig({
   fonts: {
     defaults: {
       weights: [400, 500, 600, 700]
-    }
+    },
+    // The split-flap tiles (main.css) only use the medium weight
+    families: [
+      { name: 'IBM Plex Mono', weights: [500] }
+    ]
   },
 
   icon: {
