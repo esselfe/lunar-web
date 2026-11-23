@@ -136,9 +136,9 @@ export default defineNuxtConfig({
     defaults: {
       weights: [400, 500, 600, 700]
     },
-    // The split-flap tiles (main.css) only use the medium weight
+    // The split-flap tiles (main.css) only use the regular weight
     families: [
-      { name: 'IBM Plex Mono', weights: [500] }
+      { name: 'IBM Plex Mono', weights: [400] }
     ]
   },
 
