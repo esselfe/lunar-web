@@ -74,9 +74,18 @@
               <span class="h-3 w-3 rounded-full bg-white/10" />
             </div>
             <div class="px-6 py-8 font-mono text-sm leading-7 sm:text-base">
-              <p class="text-gray-450">
-                # {{ current.comment }}
-              </p>
+              <!-- Every comment sits in the same cell and only the current one shows, so the window
+                   is always as tall as the longest one and doesn't jump between features -->
+              <div class="grid">
+                <p
+                  v-for="(feature, index) in features"
+                  :key="feature.title"
+                  class="text-gray-450 [grid-area:1/1]"
+                  :class="{ invisible: index !== active }"
+                >
+                  # {{ feature.comment }}
+                </p>
+              </div>
               <p class="text-gray-100">
                 <span
                   class="text-purple-300 select-none"
@@ -91,9 +100,17 @@
               </p>
             </div>
           </div>
-          <p class="mt-6 max-w-xl text-gray-300">
-            {{ current.detail }}
-          </p>
+          <!-- Same for the description: the longest one sets the height -->
+          <div class="mt-6 grid max-w-xl text-gray-300">
+            <p
+              v-for="(feature, index) in features"
+              :key="feature.title"
+              class="[grid-area:1/1]"
+              :class="{ invisible: index !== active }"
+            >
+              {{ feature.detail }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
