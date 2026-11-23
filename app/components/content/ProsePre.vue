@@ -4,7 +4,7 @@
     <pre :class="$props.class"><slot /></pre>
     <button
       type="button"
-      class="absolute top-2 right-2 rounded-lg border border-gray-600/50 bg-gray-800/80 p-2 text-gray-400 opacity-0 transition-all duration-200 group-hover:opacity-100 hover:border-gray-500 hover:bg-gray-700/90 hover:text-gray-200 focus:opacity-100 focus:ring-2 focus:ring-blue-500/50 focus:outline-hidden"
+      class="absolute top-2 right-2 rounded-lg border border-gray-600/50 bg-gray-800/80 p-2 text-gray-400 opacity-0 transition-all duration-200 group-hover:opacity-100 hover:border-gray-500 hover:bg-gray-700/90 hover:text-gray-200 focus:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
       :aria-label="copied ? 'Copied' : 'Copy code'"
       :title="copied ? 'Copied' : 'Copy code'"
       @click="copyCode"

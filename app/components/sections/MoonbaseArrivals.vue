@@ -423,7 +423,7 @@ onBeforeUnmount(() => {
 .board-head {
   padding-bottom: 0.6rem;
   border-bottom: 1px solid rgb(255 255 255 / 0.1);
-  color: var(--color-gray-500);
+  color: var(--color-gray-450);
 }
 
 /* Smaller labels, without changing the row's own size (the columns are sized in its em) */

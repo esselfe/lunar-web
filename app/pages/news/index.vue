@@ -28,7 +28,7 @@
         aria-label="Jump to year"
         class="mt-8 text-sm md:flex md:items-baseline md:gap-x-4"
       >
-        <p class="text-gray-500">
+        <p class="text-gray-450">
           Jump to
         </p>
         <ul class="mt-2 flex max-w-xs flex-wrap gap-x-4 gap-y-2 md:mt-0 md:max-w-none">
@@ -107,7 +107,7 @@
               </p>
               <p
                 v-if="entry.readingTime"
-                class="mt-3 text-sm text-gray-500"
+                class="mt-3 text-sm text-gray-450"
               >
                 {{ entry.readingTime }} min read
               </p>

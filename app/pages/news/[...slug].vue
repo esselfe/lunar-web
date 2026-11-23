@@ -14,7 +14,7 @@
               :phase="progress * 0.5"
               class="h-16 w-16"
             />
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-gray-450">
               {{ progress >= 1 ? 'Full moon' : `${article.readingTime ?? 1} min read` }}
             </p>
           </div>
@@ -38,7 +38,7 @@
               >by {{ article.author }}</span>
               <span
                 v-if="article.readingTime"
-                class="text-gray-500 lg:hidden"
+                class="text-gray-450 lg:hidden"
               >{{ article.readingTime }} min read</span>
             </p>
             <h1 class="mt-5 text-4xl font-bold tracking-[-0.035em] text-balance wrap-break-word text-white sm:text-5xl">
@@ -84,7 +84,7 @@
                 class="mt-0.5 h-8 w-8 shrink-0 transition-transform duration-300 group-hover:scale-110"
               />
               <span class="min-w-0">
-                <span class="block text-sm text-gray-500">Older</span>
+                <span class="block text-sm text-gray-450">Older</span>
                 <span class="mt-1 block font-medium wrap-break-word text-white transition-colors group-hover:text-indigo-200">{{ older.title }}</span>
               </span>
             </NuxtLink>
@@ -98,7 +98,7 @@
                 class="mt-0.5 h-8 w-8 shrink-0 transition-transform duration-300 group-hover:scale-110"
               />
               <span class="min-w-0">
-                <span class="block text-sm text-gray-500">Newer</span>
+                <span class="block text-sm text-gray-450">Newer</span>
                 <span class="mt-1 block font-medium wrap-break-word text-white transition-colors group-hover:text-indigo-200">{{ newer.title }}</span>
               </span>
             </NuxtLink>

@@ -5,6 +5,11 @@
   /* Inter is self-hosted at build time by @nuxt/fonts. */
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
+  /* Dim text (dates, labels, small print). Between gray-400 and gray-500: gray-500 is under WCAG AA
+     on our backgrounds (4.2:1 on gray-950, 3.7:1 on gray-900, 3.2:1 where the page gradient in
+     app.vue turns blue). This passes 4.5:1 on all of them, and on gray-800 (4.7:1). */
+  --color-gray-450: oklch(66% 0.024 262);
+
   --animate-fade-in: fade-in 0.2s ease-in-out;
 
   @keyframes fade-in {
@@ -56,6 +61,13 @@
     min-height: 100vh;
     overflow-x: hidden;
     background-color: var(--color-gray-950);
+  }
+
+  /* One keyboard focus ring everywhere, visible on the dark background. In the base layer, so a
+     component can still set its own with focus-visible: utilities. */
+  :focus-visible {
+    outline: 2px solid var(--color-indigo-300);
+    outline-offset: 2px;
   }
 
   /* Tailwind v4 no longer sets a pointer cursor on buttons. */

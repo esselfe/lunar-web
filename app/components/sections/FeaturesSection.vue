@@ -74,7 +74,7 @@
               <span class="h-3 w-3 rounded-full bg-white/10" />
             </div>
             <div class="px-6 py-8 font-mono text-sm leading-7 sm:text-base">
-              <p class="text-gray-500">
+              <p class="text-gray-450">
                 # {{ current.comment }}
               </p>
               <p class="text-gray-100">

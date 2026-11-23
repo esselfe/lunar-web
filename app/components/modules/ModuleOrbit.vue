@@ -119,7 +119,7 @@
       >{{ hovered.short }}</span>
       <span
         v-if="hovered.note"
-        class="block text-gray-500"
+        class="block text-gray-450"
       >{{ hovered.note }}</span>
     </p>
   </div>

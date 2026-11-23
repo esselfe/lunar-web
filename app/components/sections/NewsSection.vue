@@ -53,7 +53,7 @@
               />
               <time
                 :datetime="String(article.date)"
-                class="text-gray-500 tabular-nums"
+                class="text-gray-450 tabular-nums"
               >{{ formatDate(article.date) }}</time>
             </p>
             <div>
