@@ -102,23 +102,25 @@ something real. Keep new work in this spirit.
 - **Works without JavaScript and with reduced motion**: render the final state on the server, then
   animate. Follow the iPhone rules below for anything that moves.
 - **Palette:** gray-950 background, indigo/purple accents (indigo-200/300 for highlights), amber only
-  as a warning light. Copy is plain and specific, with a light touch of the theme ("Side trips",
+  as a warning light. Dim text (dates, labels, small print) is `text-gray-450`, a theme token that
+  passes WCAG AA on gray-950 and gray-900; `text-gray-500` doesn't, so keep it for borders and icons.
+  Keyboard focus is one indigo-300 outline, set globally in `main.css`. Copy is plain and specific, with a light touch of the theme ("Side trips",
   "Arrivals at the moonbase", "In orbit → Descending → Landed").
 
 **Building blocks** (reuse before inventing)
 
-| Piece | Where |
-| --- | --- |
-| Hero moon (layered: static SVG + sliding shadow + halo) | `app/components/ui/LunarMoon.vue` |
-| Moon at any phase, filter-free | `app/components/ui/MoonPhaseIcon.vue` + `app/utils/moonPhase.ts` |
-| Earth | `app/components/ui/PlanetEarth.vue` |
-| Dotted orbit that slides in / trajectory that wipes in | `app/pages/news/index.vue`, `app/pages/docs/index.vue` |
-| Constellation with a draw-in | `app/components/sections/CommunitySection.vue` |
-| Split-flap board engine | `app/components/sections/MoonbaseArrivals.vue` |
-| Reading-progress moon | `app/pages/news/[...slug].vue` |
-| Visited stops ("mission log", localStorage only) | `app/composables/useVisitedDocs.ts` |
-| Hold intros until the page has settled | `app/composables/usePageSettled.ts` |
-| Search-field button (⌘K) | `app/components/ui/SearchLauncher.vue` |
+| Piece                                                   | Where                                                            |
+|---------------------------------------------------------|------------------------------------------------------------------|
+| Hero moon (layered: static SVG + sliding shadow + halo) | `app/components/ui/LunarMoon.vue`                                |
+| Moon at any phase, filter-free                          | `app/components/ui/MoonPhaseIcon.vue` + `app/utils/moonPhase.ts` |
+| Earth                                                   | `app/components/ui/PlanetEarth.vue`                              |
+| Dotted orbit that slides in / trajectory that wipes in  | `app/pages/news/index.vue`, `app/pages/docs/index.vue`           |
+| Constellation with a draw-in                            | `app/components/sections/CommunitySection.vue`                   |
+| Split-flap board engine                                 | `app/components/sections/MoonbaseArrivals.vue`                   |
+| Reading-progress moon                                   | `app/pages/news/[...slug].vue`                                   |
+| Visited stops ("mission log", localStorage only)        | `app/composables/useVisitedDocs.ts`                              |
+| Hold intros until the page has settled                  | `app/composables/usePageSettled.ts`                              |
+| Search-field button (⌘K)                                | `app/components/ui/SearchLauncher.vue`                           |
 
 ## Animations must stay smooth on iPhone (Safari / WebKit)
 

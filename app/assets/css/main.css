@@ -63,6 +63,13 @@
     background-color: var(--color-gray-950);
   }
 
+  /* One keyboard focus ring everywhere, visible on the dark background. In the base layer, so a
+     component can still set its own with focus-visible: utilities. */
+  :focus-visible {
+    outline: 2px solid var(--color-indigo-300);
+    outline-offset: 2px;
+  }
+
   /* Tailwind v4 no longer sets a pointer cursor on buttons. */
   button:not(:disabled),
   [role="button"]:not(:disabled) {
