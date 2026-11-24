@@ -2169,7 +2169,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/conky</loc>
-    <lastmod>2026-10-26</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/conky-manager</loc>
@@ -3241,7 +3241,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/exfatprogs</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/exim</loc>
@@ -4937,7 +4937,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/gsoap</loc>
-    <lastmod>2026-06-19</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/gsound</loc>
@@ -5265,7 +5265,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/hidapi</loc>
-    <lastmod>2025-08-30</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/highlight</loc>
@@ -5761,7 +5761,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/ipython</loc>
-    <lastmod>2026-10-31</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/ipython_genutils</loc>
@@ -5821,7 +5821,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/janet</loc>
-    <lastmod>2026-11-08</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/jansson</loc>
@@ -6765,7 +6765,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/Kvantum</loc>
-    <lastmod>2026-06-19</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/kwallet</loc>
@@ -7093,7 +7093,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/libcbor</loc>
-    <lastmod>2026-11-15</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/libccd</loc>
@@ -9225,11 +9225,11 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/m17n-db</loc>
-    <lastmod>2026-05-27</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/m17n-lib</loc>
-    <lastmod>2026-05-27</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/m4</loc>
@@ -9557,7 +9557,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/miniupnpc</loc>
-    <lastmod>2025-10-25</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/minizip</loc>
@@ -11333,7 +11333,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/podofo</loc>
-    <lastmod>2026-11-17</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/polari</loc>
@@ -11849,7 +11849,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-exceptiongroup</loc>
-    <lastmod>2026-03-03</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-faker</loc>
@@ -11869,7 +11869,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-flit-scm</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-freezegun</loc>
@@ -11901,7 +11901,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-hatchling</loc>
-    <lastmod>2026-09-13</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-html2text</loc>
@@ -12029,7 +12029,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-mechanize</loc>
-    <lastmod>2024-07-31</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-msgpack</loc>
@@ -12069,7 +12069,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-owslib</loc>
-    <lastmod>2026-04-10</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-packaging</loc>
@@ -12189,7 +12189,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-pyasn1</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-pyasn1-modules</loc>
@@ -12369,7 +12369,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-reportlab</loc>
-    <lastmod>2026-09-16</lastmod>
+    <lastmod>2026-11-23</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/python-requests</loc>
@@ -13033,151 +13033,151 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-5compat</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-base</loc>
-    <lastmod>2026-11-16</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-canvaspainter</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-charts</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-connectivity</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-datavis3d</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-declarative</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-doc</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-graphs</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-grpc</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-httpserver</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-imageformats</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-languageserver</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-location</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-lottie</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-multimedia</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-networkauth</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-positioning</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-profile</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-qt3d</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-quick3d</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-quick3dphysics</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-quickeffectmaker</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-quicktimeline</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-remoteobjects</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-scxml</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-sensors</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-serialbus</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-serialport</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-shadertools</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-speech</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-svg</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-tasktree</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-tools</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-translations</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-wayland</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-webchannel</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-webengine</loc>
@@ -13185,11 +13185,11 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-websockets</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6-webview</loc>
-    <lastmod>2026-10-06</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/qt6ct</loc>
@@ -14597,7 +14597,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/syslog-ng</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/sysprof</loc>
@@ -15281,7 +15281,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/umockdev</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/unace</loc>
@@ -17093,7 +17093,7 @@
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/yt-dlp</loc>
-    <lastmod>2026-10-27</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://esselfe.github.io/lunar-web/modules/ytmusicapi</loc>
