@@ -43,7 +43,7 @@
         >
           <NuxtLink
             :to="article.path"
-            class="group grid gap-x-10 gap-y-2 py-7 md:grid-cols-[10rem_minmax(0,1fr)]"
+            class="group -mx-3 grid gap-x-10 gap-y-2 rounded-md px-3 py-7 transition-colors hover:bg-white/[0.03] md:grid-cols-[10rem_minmax(0,1fr)]"
           >
             <!-- The moon on the night it was posted, as in the news log -->
             <p class="flex items-center gap-3 self-start pt-1 text-sm">
