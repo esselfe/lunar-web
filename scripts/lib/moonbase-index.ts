@@ -46,7 +46,10 @@ export type RepositoryCopy = {
 
 type Found = { name: string, repo: string, path: string, dir: string }
 
-/** Every folder with a DETAILS file, as `section/…/module` paths. zlocal and dot folders are skipped. */
+/**
+ * Every folder with a DETAILS file, as `section/…/module` paths. zlocal and dot folders are skipped.
+ * Like lunar (libs/modules.lunar), a DETAILS.x86_64 alone also makes a module (NVIDIA has only that).
+ */
 const findModules = (repo: RepositoryCopy): Found[] => {
   const found: Found[] = []
   const visit = (dir: string, path: string) => {
@@ -54,7 +57,7 @@ const findModules = (repo: RepositoryCopy): Found[] => {
       if (!entry.isDirectory() || entry.name.startsWith('.') || entry.name === 'zlocal') continue
       const child = join(dir, entry.name)
       const childPath = path ? `${path}/${entry.name}` : entry.name
-      if (existsSync(join(child, 'DETAILS'))) found.push({ name: entry.name, repo: repo.name, path: childPath, dir: child })
+      if (existsSync(join(child, 'DETAILS')) || existsSync(join(child, 'DETAILS.x86_64'))) found.push({ name: entry.name, repo: repo.name, path: childPath, dir: child })
       else visit(child, childPath)
     }
   }
