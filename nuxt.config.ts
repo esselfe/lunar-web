@@ -116,7 +116,7 @@ export default defineNuxtConfig({
       // Prefixed with the base URL, and pages with a trailing slash, so they match the links the
       // crawler finds (no duplicate renders).
       routes: [
-        ...['/rss.xml', '/sitemap.xml', '/robots.txt', '/search.json', '/moonbase-arrivals.json', '/modules/index.json', '/modules/search.json']
+        ...['/rss.xml', '/sitemap.xml', '/robots.txt', '/llms.txt', '/search.json', '/moonbase-arrivals.json', '/modules/index.json', '/modules/search.json']
           .map(route => joinURL(baseURL, route)),
         ...['/', '/news', '/docs', '/docs/about', ...contentRoutes()]
           .map(route => withTrailingSlash(joinURL(baseURL, route)))
