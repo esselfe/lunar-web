@@ -87,7 +87,7 @@ That made Lunar a home for administrators, developers and the plain curious: peo
 
 Changes poured into the moonbase and ISOs rolled off the launch pad. Mission control was a single machine called **dbguin**, which carried the CVS repository, the mail and the downloads all at once. When it went dark in November 2003, the #lunar topic sent everyone to mirrors in Denmark, the Netherlands and a university machine in Berlin. In August 2004 Lunar moved to a new server, **espresso**, and shared it with a neighbour: xfce.org. Together they went by foo-projects.org, short for "free Opensource Oriented projects".
 
-There was a new face, too. In December 2003 Lunar got a new logo, which the channel promptly called "menacing and evil". It looked great on the login screen.
+There was a new face, too. In December 2003 Lunar got a new logo, which the channel promptly called "menacing and evil". It looked great on the login screen, and it stayed Lunar's face for nearly two decades, until a new logo arrived in 2022: the one at the top of this page.
 
 A few landmarks, dated from the channel topics, the release tags and the git history:
 
