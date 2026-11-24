@@ -12,7 +12,7 @@ const module = (name: string) => index.modules.find(found => found.name === name
 describe('buildMoonbaseIndex', () => {
   it('lists every module once, sorted, preferring an active module over a crater copy', () => {
     expect(index.modules.map(found => found.name)).toEqual([
-      'curl', 'kcoreaddons', 'kf5', 'libressl', 'nano', 'oldtool', 'openssl', 'rocket', 'zlib'
+      'curl', 'kcoreaddons', 'kf5', 'libressl', 'nano', 'NVIDIA', 'oldtool', 'openssl', 'rocket', 'zlib'
     ])
     expect(module('openssl')).toMatchObject({ repo: 'core', path: 'libs/openssl', version: '3.6.0' })
     expect(warnings).toContain(
@@ -46,6 +46,10 @@ describe('buildMoonbaseIndex', () => {
       source: 'https://download.kde.org/stable/frameworks/5.116/kcoreaddons-5.116.0.tar.xz'
     })
     expect(module('zlib').source).toBe('https://downloads.sourceforge.net/sourceforge/libpng/zlib-1.3.1.tar.xz')
+  })
+
+  it('finds a module that has only a DETAILS.x86_64, as lunar does', () => {
+    expect(module('NVIDIA')).toMatchObject({ repo: 'other', path: 'driver/NVIDIA', section: 'driver', version: '620.73.04' })
   })
 
   it('leaves out a website that is not a URL, with a warning', () => {
