@@ -138,4 +138,15 @@ usePageSeo({
   description: page.value.description,
   type: 'article'
 })
+
+const organization = useOrganization()
+const pageUrl = usePageUrl()
+useStructuredData(() => ({
+  '@type': 'TechArticle',
+  'headline': page.value.title,
+  'description': page.value.description,
+  'url': pageUrl(path),
+  ...(page.value.lastUpdated ? { dateModified: new Date(page.value.lastUpdated).toISOString().slice(0, 10) } : {}),
+  'publisher': { '@id': organization['@id'] }
+}))
 </script>

@@ -52,7 +52,8 @@ export default defineNuxtConfig({
         // (sizes="32x32" stops Chrome from preferring the ICO over the SVG).
         { rel: 'icon', type: 'image/svg+xml', href: `${baseURL}favicon.svg` },
         { rel: 'icon', href: `${baseURL}favicon.ico`, sizes: '32x32' },
-        // The same mark on the page background, for iOS home-screen bookmarks
+        // The same mark on the page background, for iOS home-screen bookmarks (also the logo in the
+        // homepage's structured data)
         { rel: 'apple-touch-icon', href: `${baseURL}apple-touch-icon.png` },
         { rel: 'alternate', type: 'application/rss+xml', title: 'Lunar Linux News', href: `${baseURL}rss.xml` }
       ]
