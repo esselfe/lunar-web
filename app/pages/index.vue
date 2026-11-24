@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 usePageSeo({
-  description: 'Lunar Linux combines the flexibility of source-based distributions with user-friendly tools and interfaces. Build your system exactly how you want it, with the support you need.'
+  description: 'Lunar Linux is a source-based distribution: build your system exactly how you want it, with simple tools and a friendly community.'
 })
 
 const organization = useOrganization()
