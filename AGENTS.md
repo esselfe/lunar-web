@@ -32,7 +32,7 @@ docker compose up dev         # dev server in Docker (no local Node), http://loc
 - `server/routes/`: `rss.xml`, `sitemap.xml`, `robots.txt`, `search.json`, `moonbase-arrivals.json` (logic in `server/utils/moonbase.ts`), `modules/index.json` (the module index, read by `server/utils/moonbaseIndex.ts`); all prerendered
 - `scripts/`: `check-content.mjs` and `check-links.mjs` (content and built-site link validation), `moonbase-feed.mjs` (live arrivals feed), `moonbase-index.mjs` (`yarn moonbase:index`: builds the module index from git clones; the parser and builder are in `scripts/lib/`, types in `shared/types/moonbase-index.ts`)
 - `content/news/`: one file per post, named `YYYY-MM-DD-slug.md` after its `date` (`check-content` enforces it). Posts up to 2023 were imported from the old WordPress site
-- `docker/legacy-redirects.conf`: nginx 301s from the old WordPress news URLs (`/YYYY/MM/DD/slug/`) to `/news/…`, and nothing else. Only used when served at the root. `test/legacy-redirects.test.ts` checks every target exists, so renaming a news file means updating this list
+- `docker/legacy-redirects.conf`: the old WordPress URLs (news posts `/YYYY/MM/DD/slug/`, and `/downloads/`) and their new pages, and nothing else. nginx answers them with 301s (only when served at the root); `modules/legacy-redirects.ts` writes a forwarding page (instant meta refresh + canonical) at each old URL for hosts that can't redirect, such as GitHub Pages. `test/legacy-redirects.test.ts` checks every target exists, so renaming a news file means updating this list
 
 ## Rules that are easy to break
 

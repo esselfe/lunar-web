@@ -24,7 +24,9 @@ export default defineNuxtConfig({
     '@nuxt/content',
     '@nuxt/eslint',
     '@nuxt/fonts',
-    '@nuxt/icon'
+    '@nuxt/icon',
+    // Forwarding pages at the old WordPress URLs (docker/legacy-redirects.conf)
+    './modules/legacy-redirects'
   ],
 
   // Register components by file name only (`<DocCard>`, not `<UiDocCard>`).
