@@ -15,7 +15,7 @@
       <template v-if="!compact">
         <span>Search docs...</span>
         <kbd class="ml-auto hidden rounded-sm border border-gray-700 bg-gray-800 px-2 py-0.5 text-xs text-gray-450 sm:inline-block">
-          {{ shortcutLabel }}
+          <ShortcutLabel />
         </kbd>
       </template>
     </button>
@@ -177,7 +177,6 @@ const query = ref('')
 const results = ref<SearchResult[]>([])
 const { isOpen, open: openDialog, close: closeDialog } = useSearchDialog()
 const searchInput = ref<HTMLInputElement>()
-const shortcutLabel = ref('Ctrl K')
 const activeIndex = ref(0)
 const listbox = ref<HTMLUListElement>()
 
@@ -260,7 +259,6 @@ const onKeydown = (event: KeyboardEvent) => {
 }
 
 onMounted(() => {
-  if (/Mac|iPhone|iPad/.test(navigator.platform)) shortcutLabel.value = '⌘K'
   // The header also renders a compact instance for mobile; only the full one owns the shortcuts.
   if (!props.compact) window.addEventListener('keydown', onKeydown)
 })
