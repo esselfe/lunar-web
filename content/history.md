@@ -34,7 +34,7 @@ As Sorcerer grew, so did the arguments about where it was heading and who got to
 
 They called the new project **Lunar Penguin**. It wasn't a rebellion for the fun of it: the idea was to keep Sorcerer's technology alive and keep improving it together, in the open. Lunar Penguin was soon renamed **Lunar Linux**, and the Lunar-Penguin name stayed on as an umbrella for any sister projects that might follow.
 
-The moon and the penguin were already in the family. Chuck Mead's own website had been running a comic about a penguin called Dirty Bird, and by March 2002 lunar-penguin.org greeted visitors with "Lunar Penguin is out of this world!", a tagline that would still be in the #lunar topic twenty years later. On 28 March 2002 Chuck cleared up the name: "Lunar-Penguin is actually a development group. Lunar-Linux is the group's first product."
+The moon and the penguin were already in the family: Chuck Mead's consulting firm was called MoonGroup, and its website ran a comic about a penguin called Dirty Bird. By March 2002 lunar-penguin.org greeted visitors with "Lunar Penguin is out of this world!", a tagline that would still be in the #lunar topic twenty years later. On 28 March 2002 Chuck cleared up the name: "Lunar-Penguin is actually a development group. Lunar-Linux is the group's first product."
 
 The first piece of magic to get a new name was the spell-caster itself. On 19 May 2002 Kagan Kongar, Lunar's main developer at the time, rewrote Sorcerer's `cast` as `lin`, and kept the old copyright notices in its header "just in case some code is left :=)". Open `lin` today and that note is still sitting at the top.
 
