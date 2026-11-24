@@ -89,6 +89,9 @@ Changes poured into the moonbase and ISOs rolled off the launch pad. Mission con
 
 There was a new face, too. In December 2003 Lunar got a new logo, which the channel promptly called "menacing and evil". It looked great on the login screen, and it stayed Lunar's face for nearly two decades, until a new logo arrived in 2022: the one at the top of this page.
 
+:::history-logos
+:::
+
 A few landmarks, dated from the channel topics, the release tags and the git history:
 
 - **July 2003:** Lunar 1.3.1 is the release everyone installs when the oldest surviving #lunar logs begin
