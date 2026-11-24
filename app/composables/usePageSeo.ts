@@ -1,4 +1,4 @@
-import { withoutTrailingSlash } from 'ufo'
+import { withTrailingSlash } from 'ufo'
 
 type PageSeo = {
   title?: string
@@ -11,18 +11,23 @@ export const usePageSeo = (seo: MaybeRefOrGetter<PageSeo>) => {
   const route = useRoute()
   const { absoluteUrl } = useSiteLinks()
 
-  const canonical = computed(() => absoluteUrl(withoutTrailingSlash(route.path) || '/'))
+  // With a trailing slash: the URL static hosts serve pages at (`/docs` redirects to `/docs/`).
+  const canonical = computed(() => withTrailingSlash(absoluteUrl(route.path)))
   const value = computed(() => toValue(seo))
 
   useSeoMeta({
     title: () => value.value.title,
     description: () => value.value.description,
-    ogTitle: () => value.value.title ?? 'Lunar Linux',
+    ogTitle: () => value.value.title ?? SITE_NAME,
     ogDescription: () => value.value.description,
     ogType: () => value.value.type ?? 'website',
     ogUrl: canonical,
-    ogSiteName: 'Lunar Linux',
-    twitterCard: 'summary'
+    ogSiteName: SITE_NAME,
+    ogImage: absoluteUrl(SHARE_IMAGE.path),
+    ogImageWidth: SHARE_IMAGE.width,
+    ogImageHeight: SHARE_IMAGE.height,
+    ogImageAlt: SHARE_IMAGE.alt,
+    twitterCard: 'summary_large_image'
   })
 
   useHead({

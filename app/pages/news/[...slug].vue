@@ -172,4 +172,18 @@ usePageSeo({
   description: article.value.description,
   type: 'article'
 })
+
+const organization = useOrganization()
+const pageUrl = usePageUrl()
+const { absoluteUrl } = useSiteLinks()
+useStructuredData(() => ({
+  '@type': 'BlogPosting',
+  'headline': article.value.title,
+  'description': article.value.description,
+  'datePublished': new Date(article.value.date).toISOString().slice(0, 10),
+  'url': pageUrl(article.value.path),
+  'image': absoluteUrl(SHARE_IMAGE.path),
+  ...(article.value.author ? { author: { '@type': 'Person', 'name': article.value.author } } : {}),
+  'publisher': { '@id': organization['@id'] }
+}))
 </script>

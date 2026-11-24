@@ -50,4 +50,16 @@ const trail = computed<Crumb[]>(() => [{ label: 'Home', path: '/' }, ...props.it
 
 const route = useRoute()
 const isCurrent = (item: Crumb) => navCurrent(route.path, item.path) === 'page'
+
+// The same trail for search engines
+const pageUrl = usePageUrl()
+useStructuredData(() => ({
+  '@type': 'BreadcrumbList',
+  'itemListElement': trail.value.map((item, index) => ({
+    '@type': 'ListItem',
+    'position': index + 1,
+    'name': item.label,
+    'item': pageUrl(item.path)
+  }))
+}))
 </script>

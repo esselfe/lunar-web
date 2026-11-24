@@ -14,10 +14,10 @@ We still need to discuss a little bit more on the rules for stable and unstable;
 Thanks to all the developers making this possible!
 
 **Step 1** - Everything as usual  
-![The lunar main menu, with Option Menu selected](/images/news/moonbase-stable-01.png)
+![The lunar main menu, with Option Menu selected](/images/news/moonbase-stable-01.png){width="486" height="342"}
 
 **Step 2** - Whoooa. There's a new menu item!  
-![The Option Menu, with the new Default Moonbase Branch item](/images/news/moonbase-stable-02.png)
+![The Option Menu, with the new Default Moonbase Branch item](/images/news/moonbase-stable-02.png){width="486" height="342"}
 
 **Step 3** - Cool. mkay?  
-![Choosing the stable or unstable moonbase branch](/images/news/moonbase-stable-03.png)
+![Choosing the stable or unstable moonbase branch](/images/news/moonbase-stable-03.png){width="486" height="342"}

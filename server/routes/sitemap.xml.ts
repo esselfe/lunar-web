@@ -1,5 +1,5 @@
 import { queryCollection } from '@nuxt/content/server'
-import { joinURL } from 'ufo'
+import { joinURL, withTrailingSlash } from 'ufo'
 
 type SitemapEntry = { path: string, lastmod?: string | Date }
 
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
   const urls = entries.map(({ path, lastmod }) => {
     const lastmodTag = lastmod ? `\n    <lastmod>${new Date(lastmod).toISOString().slice(0, 10)}</lastmod>` : ''
-    return `  <url>\n    <loc>${escapeXml(joinURL(siteUrl, path))}</loc>${lastmodTag}\n  </url>`
+    return `  <url>\n    <loc>${escapeXml(withTrailingSlash(joinURL(siteUrl, path)))}</loc>${lastmodTag}\n  </url>`
   })
 
   setResponseHeader(event, 'content-type', 'application/xml; charset=utf-8')
