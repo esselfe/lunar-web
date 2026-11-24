@@ -18,12 +18,16 @@ export const usePageSeo = (seo: MaybeRefOrGetter<PageSeo>) => {
   useSeoMeta({
     title: () => value.value.title,
     description: () => value.value.description,
-    ogTitle: () => value.value.title ?? 'Lunar Linux',
+    ogTitle: () => value.value.title ?? SITE_NAME,
     ogDescription: () => value.value.description,
     ogType: () => value.value.type ?? 'website',
     ogUrl: canonical,
-    ogSiteName: 'Lunar Linux',
-    twitterCard: 'summary'
+    ogSiteName: SITE_NAME,
+    ogImage: absoluteUrl(SHARE_IMAGE.path),
+    ogImageWidth: SHARE_IMAGE.width,
+    ogImageHeight: SHARE_IMAGE.height,
+    ogImageAlt: SHARE_IMAGE.alt,
+    twitterCard: 'summary_large_image'
   })
 
   useHead({
