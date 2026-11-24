@@ -34,9 +34,13 @@ As Sorcerer grew, so did the arguments about where it was heading and who got to
 
 They called the new project **Lunar Penguin**. It wasn't a rebellion for the fun of it: the idea was to keep Sorcerer's technology alive and keep improving it together, in the open. Lunar Penguin was soon renamed **Lunar Linux**, and the Lunar-Penguin name stayed on as an umbrella for any sister projects that might follow.
 
+The moon and the penguin were already in the family. Chuck Mead's own website had been running a comic about a penguin called Dirty Bird, and by March 2002 lunar-penguin.org greeted visitors with "Lunar Penguin is out of this world!", a tagline that would still be in the #lunar topic twenty years later. On 28 March 2002 Chuck cleared up the name: "Lunar-Penguin is actually a development group. Lunar-Linux is the group's first product."
+
 The first piece of magic to get a new name was the spell-caster itself. On 19 May 2002 Kagan Kongar, Lunar's main developer at the time, rewrote Sorcerer's `cast` as `lin`, and kept the old copyright notices in its header "just in case some code is left :=)". Open `lin` today and that note is still sitting at the top.
 
 The oldest commit that survives in our repositories is dated **21 August 2002**: Chuck Mead's "Initial revision" of the package manager, carried over from the project's original CVS repository. The moonbase's history starts on the very same day.
+
+Six weeks later, on 1 October 2002, Lunar 1.0 lifted off. Its codename was **Dirty Bird**, after Chuck's comic penguin, and the announcement thanked the whole crew, with Kagan Kongar as lead developer. The very first comment underneath it read: "Lunar Linux is less a distribution than a programming project between friends." It was meant as a jab. We'll take it as a compliment.
 ::
 
 ::history-chapter{phase="0.25" when="2002"}
@@ -94,7 +98,11 @@ There was a new face, too. In December 2003 Lunar got a new logo, which the chan
 
 A few landmarks, dated from the channel topics, the release tags and the git history:
 
-- **July 2003:** Lunar 1.3.1 is the release everyone installs when the oldest surviving #lunar logs begin
+- **November 2002:** Lunar 1.1.1, "Nano"
+- **January 2003:** Lunar 1.2, "Pico". Nano and Pico, like the text editors
+- **January 2003:** Lunar moves to a server of its own
+- **March 2003:** Lunar 1.3, "mouse X"
+- **April 2003:** Lunar 1.3.1, still the release everyone installs when the oldest surviving #lunar logs begin in July
 - **August 2003:** Lunar 1.3.2, with an xdelta patch so 1.3.1 users could skip most of the download
 - **January 2004:** Lunar 1.3.3, with a BitTorrent tracker to share the load
 - **February 2004:** the first Lunar Weekly News, stitched together from the developers' announcements
@@ -197,4 +205,4 @@ The Moon keeps going. So does Lunar.
 
 ## Sources
 
-The early history is consistent across several independent accounts: DistroWatch's description of Lunar Linux, LWN's 2005 article "About Source Mage", Source Mage's own history page, and the recollections of people who were there. Many of the stories from 2003 onward come from the logs of #lunar on IRC, from July 2003 to today, and its channel topics. Other dates from August 2002 onward come from the git history and release tags of the [Lunar repositories](https://github.com/lunar-linux). The moonlight calendar counts non-merge commits across the eight moonbase repositories, as of 21 November 2026.
+The early history is consistent across several independent accounts: DistroWatch's description of Lunar Linux, LWN's 2005 article "About Source Mage", Source Mage's own history page, and the recollections of people who were there. The years 2001 to 2003 come alive in the Wayback Machine's snapshots of lunar-penguin.org and lunar-linux.org. Many of the stories from 2003 onward come from the logs of #lunar on IRC, from July 2003 to today, and its channel topics. Other dates from August 2002 onward come from the git history and release tags of the [Lunar repositories](https://github.com/lunar-linux). The moonlight calendar counts non-merge commits across the eight moonbase repositories, as of 21 November 2026.
