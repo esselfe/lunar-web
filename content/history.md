@@ -85,9 +85,9 @@ That made Lunar a home for administrators, developers and the plain curious: peo
 ::history-chapter{phase="0.5" when="2002–2014"}
 ## The full-moon years
 
-Changes poured into the moonbase and ISOs rolled off the launch pad. Mission control was a single machine called **dbguin**, which carried the CVS repository, the mail and the downloads all at once. When it went dark in November 2003, the #lunar topic sent everyone to mirrors in Denmark, the Netherlands and a university machine in Berlin. In August 2004 Lunar moved to a new server, **espresso**, and shared it with a neighbour: xfce.org. sofar named the shared home foo-projects.org, for "free Opensource Oriented projects".
+Changes poured into the moonbase and ISOs rolled off the launch pad. Mission control was a single machine called **dbguin**, which carried the CVS repository, the mail and the downloads all at once. When it went dark in November 2003, the #lunar topic sent everyone to mirrors in Denmark, the Netherlands and a university machine in Berlin. In August 2004 Lunar moved to a new server, **espresso**, and shared it with a neighbour: xfce.org. Together they went by foo-projects.org, short for "free Opensource Oriented projects".
 
-There was a new face, too. In December 2003 Moe drew a new Lunar logo, which the channel promptly called "menacing and evil". It looked great on the login screen.
+There was a new face, too. In December 2003 Lunar got a new logo, which the channel promptly called "menacing and evil". It looked great on the login screen.
 
 A few landmarks, dated from the channel topics, the release tags and the git history:
 
@@ -104,11 +104,11 @@ A few landmarks, dated from the channel topics, the release tags and the git his
 - **February 2007:** Lunar 1.6.1
 - **November 2007:** the code moves from Subversion to Git, before GitHub even existed
 - **December 2008:** Lunar 1.6.4
-- **August 2010:** Lunar 1.6.5, built by Ratler, in the moonbase's busiest year on record
+- **August 2010:** Lunar 1.6.5, in the moonbase's busiest year on record
 - **September 2010:** systemd lands in the moonbase, six months after systemd's first release. Trying it took one boot option
 - **April 2012:** the moonbase splits into sections: core, X.Org, Xfce and EFL first, with KDE and GNOME 3 following by July
 - **1 July 2012:** everything moves to [GitHub](https://github.com/lunar-linux)
-- **October 2014:** Lunar 1.7.0, Ratler again at the controls
+- **October 2014:** Lunar 1.7.0
 ::
 
 ::history-chapter{phase="0.625" when="2014–2017"}
@@ -118,7 +118,7 @@ After 1.7.0 the releases paused, and the public channels went quiet. From the ou
 
 Every year or two a stranger floated into #lunar to ask whether Lunar was still alive. In August 2016 the question was barely two minutes old when the build bot answered for us: "[FAILED] moonbase-core build #737 – elfutils: version bumped to 0.167." Not the most flattering reply, but definitely a pulse.
 
-That bot had joined the channel in November 2014, the voice of a Jenkins server Ratler had set up to test every change. Ratler has also kept Lunar's servers running for years, quietly, the way good ground crews do. The bot built the moonbase's changes and reported every result in #lunar: nearly 3,900 of them by May 2021. In August 2017 dagbrown got the ISO building itself every day, and announced it with quiet pride: "Three successful daily isos in a row!" dagbrown has looked after the daily ISOs ever since. In October 2017 we finally said it out loud: [we are still very much alive](/news/2017-10-18-we-are-still-very-much-alive).
+That bot had joined the channel in November 2014, the voice of a new Jenkins server that tested every change. Like the servers it ran on, it was kept going year after year, quietly, the way good ground crews do. The bot built the moonbase's changes and reported every result in #lunar: nearly 3,900 of them by May 2021. In August 2017 the ISO started building itself every day, announced in the channel with quiet pride: "Three successful daily isos in a row!" The daily builds have been rolling off the pad ever since. In October 2017 we finally said it out loud: [we are still very much alive](/news/2017-10-18-we-are-still-very-much-alive).
 
 And we were. The releases had paused, but the moonbase never did. Here is every year since that first commit, one moon each. The fuller the moon, the more changes landed in the moonbase that year:
 
@@ -164,7 +164,7 @@ Since then the tools have changed, the way tools do.
 
 In May 2021 freenode, home of #lunar since before our oldest logs, changed hands, and most of its staff walked out to start Libera.Chat. We [followed within days](/news/2021-05-23-we-are-moving-to-libera-chat-network) and left a note in the old channel's topic pointing the way. Five days later freenode's new owners took the channel over: the note itself was "in violation of freenode policy". Some of us still remembered 2006, when the #lunar topic read "RIP Rob, Thanks for everything" for Rob Levin, the founder of freenode.
 
-Continuous integration still checks every contribution, and a linter now reads every module. Since March 2026 there's also moonbeam, Ratler's newest crew member: ask it on IRC for a version bump (`.module update gmic to 3.7.3`), and an AI agent does the work and opens the pull request, which CI then builds like any other. By November 2026 it had opened more than 1,100 of them. On this site, the [arrivals board](/#moonbase) shows modules landing in the moonbase as it happens.
+Continuous integration still checks every contribution, and a linter now reads every module. Since March 2026 there's also moonbeam, the newest member of the crew: ask it on IRC for a version bump (`.module update gmic to 3.7.3`), and an AI agent does the work and opens the pull request, which CI then builds like any other. By November 2026 it had opened more than 1,100 of them. On this site, the [arrivals board](/#moonbase) shows modules landing in the moonbase as it happens.
 
 None of that changed what Lunar is.
 ::
