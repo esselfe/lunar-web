@@ -118,7 +118,7 @@ A few landmarks, dated from the channel topics, the release tags and the git his
 - **August 2010:** Lunar 1.6.5, in the moonbase's busiest year on record
 - **September 2010:** systemd lands in the moonbase, six months after systemd's first release. Trying it took one boot option
 - **April 2012:** the moonbase splits into sections: core, X.Org, Xfce and EFL first, with KDE and GNOME 3 following by July
-- **1 July 2012:** everything moves to [GitHub](https://github.com/lunar-linux)
+- **July 2012:** everything moves to [GitHub](https://github.com/lunar-linux)
 - **October 2014:** Lunar 1.7.0
 ::
 
