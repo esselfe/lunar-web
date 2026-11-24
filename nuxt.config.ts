@@ -155,8 +155,12 @@ export default defineNuxtConfig({
     defaults: {
       weights: [400, 500, 600, 700]
     },
-    // The split-flap tiles (main.css) only use the regular weight
     families: [
+      // Preload Inter's Latin file (a variable font: one file covers every weight). Without it the
+      // browser only finds the font after parsing the CSS, paints the page in a fallback font, then
+      // re-flows every line when Inter arrives: a visible flicker on a first, uncached visit.
+      { name: 'Inter', preload: { subsets: ['latin'], styles: ['normal'] } },
+      // The split-flap tiles (main.css) only use the regular weight
       { name: 'IBM Plex Mono', weights: [400] }
     ]
   },
