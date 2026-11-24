@@ -165,6 +165,7 @@
 </template>
 
 <script setup lang="ts">
+import { withTrailingSlash } from 'ufo'
 import type { SearchResult } from '~/composables/useDocSearch'
 
 const props = withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
@@ -204,7 +205,8 @@ if (!props.compact) {
 const openResult = (index: number) => {
   const result = results.value[index]
   if (result) {
-    navigateTo(result.path)
+    // `true`: keep a `#heading` after the slash (`/docs/faq/#id`)
+    navigateTo(withTrailingSlash(result.path, true))
     close()
   }
 }

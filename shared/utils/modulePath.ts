@@ -1,6 +1,6 @@
 /**
- * A module page's path. Names that end like a file extension (`webkit2gtk-4.1`, `CGI.pm`,
- * `fltk1.3`) get a trailing slash: without it, the prerenderer takes the link for a file and
- * never builds the page, and static hosts would serve it as a download.
+ * A module page's path, with a trailing slash like every page URL on the site. Names that end like
+ * a file extension (`webkit2gtk-4.1`, `CGI.pm`, `fltk1.3`) need it most: without it, the
+ * prerenderer takes the link for a file and never builds the page.
  */
-export const modulePath = (name: string) => (/\.[^./]+$/.test(name) ? `/modules/${name}/` : `/modules/${name}`)
+export const modulePath = (name: string) => `/modules/${name}/`

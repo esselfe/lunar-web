@@ -2,7 +2,7 @@
 import { readdirSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
-import { joinURL } from 'ufo'
+import { joinURL, withTrailingSlash } from 'ufo'
 
 // Path the site is served from, e.g. '/' (production) or '/lunar-www/' (GitHub Pages preview).
 // Override at build time: NUXT_APP_BASE_URL=/lunar-www/ yarn generate
@@ -91,6 +91,15 @@ export default defineNuxtConfig({
     inlineStyles: false
   },
 
+  // Pages are built as `docs/index.html`, so static hosts serve them at `/docs/` and redirect `/docs`
+  // there. Links use the slash form too (canonical URLs and the sitemap do the same), so no click,
+  // crawl or canonical goes through a redirect.
+  experimental: {
+    defaults: {
+      nuxtLink: { trailingSlash: 'append' }
+    }
+  },
+
   compatibilityDate: '2026-11-20',
 
   nitro: {
@@ -99,9 +108,14 @@ export default defineNuxtConfig({
       crawlLinks: true,
       // A broken internal link makes the crawler hit a 404 and fails the build.
       failOnError: true,
-      // Prefixed with the base URL so they match the links the crawler finds (no duplicate renders).
-      routes: ['/', '/news', '/docs', '/rss.xml', '/sitemap.xml', '/robots.txt', '/search.json', '/moonbase-arrivals.json', '/modules/index.json', '/modules/search.json', '/docs/about', ...contentRoutes()]
-        .map(route => joinURL(baseURL, route))
+      // Prefixed with the base URL, and pages with a trailing slash, so they match the links the
+      // crawler finds (no duplicate renders).
+      routes: [
+        ...['/rss.xml', '/sitemap.xml', '/robots.txt', '/search.json', '/moonbase-arrivals.json', '/modules/index.json', '/modules/search.json']
+          .map(route => joinURL(baseURL, route)),
+        ...['/', '/news', '/docs', '/docs/about', ...contentRoutes()]
+          .map(route => withTrailingSlash(joinURL(baseURL, route)))
+      ]
     }
   },
 

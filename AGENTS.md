@@ -38,6 +38,7 @@ docker compose up dev         # dev server in Docker (no local Node), http://loc
 
 - Content v3 APIs only: `queryCollection('docs').path(p).first()`, `queryCollection(event, 'news')` on the server (import from `@nuxt/content/server`). No `queryContent`/`_path`.
 - Normalize route paths with `withoutTrailingSlash(route.path)` before querying by path.
+- Page URLs end in a slash (`/docs/faq/`): static hosts serve `docs/faq/index.html` there and redirect `/docs/faq`. `<NuxtLink>` adds it (`trailingSlash: 'append'` in `nuxt.config.ts`); canonical links, the sitemap and RSS use `withTrailingSlash`, and so must any other absolute page URL or `navigateTo()` target. Files (`/rss.xml`) don't get one.
 - Never hardcode root-absolute URLs in `href`/`src`/`$fetch`: `<NuxtLink>` for routes, `~/assets/...` for images, `withBase()` for prerendered files. The site must work under a sub-path.
 - New server routes must be added to `nitro.prerender.routes` in `nuxt.config.ts`. Every `content/**/*.md` is prerendered automatically, so a `.md` file there that isn't a page breaks the build.
 - `failOnError: true`: a link to a missing page fails `yarn generate`. Content links must be absolute (`/docs/...`); `check-content` rejects relative ones.

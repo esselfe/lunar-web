@@ -1,12 +1,12 @@
 import { queryCollection } from '@nuxt/content/server'
-import { joinURL } from 'ufo'
+import { joinURL, withTrailingSlash } from 'ufo'
 
 export default defineEventHandler(async (event) => {
   const { siteUrl } = useRuntimeConfig(event).public
   const articles = await queryCollection(event, 'news').order('date', 'DESC').all()
 
   const items = articles.map((article) => {
-    const url = joinURL(siteUrl, article.path)
+    const url = withTrailingSlash(joinURL(siteUrl, article.path))
     return `    <item>
       <title>${escapeXml(article.title)}</title>
       <link>${escapeXml(url)}</link>
