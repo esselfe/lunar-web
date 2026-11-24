@@ -75,6 +75,7 @@
         v-for="dot in ring.dots"
         :key="dot.key"
         :href="dot.to ? withBase(dot.to) : undefined"
+        :aria-label="dot.name"
         tabindex="-1"
         :class="{ 'is-hovered': hovered?.key === dot.key }"
         @click="go($event, dot.to)"
