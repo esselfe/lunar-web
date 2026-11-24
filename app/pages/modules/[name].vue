@@ -344,7 +344,7 @@ const generatedAt = computed(() => page.value.generatedAt)
 
 usePageSeo(() => ({
   title: `${module.value.name} ${module.value.version ?? ''}`.trim(),
-  description: module.value.short ?? `The ${module.value.name} module in the Lunar Linux moonbase.`
+  description: moduleDescription(module.value)
 }))
 
 const required = computed(() => module.value.depends.filter(dependency => !dependency.optional))
