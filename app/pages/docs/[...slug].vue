@@ -43,7 +43,7 @@
 
       <ContentRenderer
         :value="page"
-        class="prose max-w-none prose-invert prose-a:text-blue-400 hover:prose-a:text-blue-300 prose-pre:border prose-pre:border-gray-700 prose-pre:bg-gray-900"
+        class="prose max-w-none prose-invert prose-a:text-blue-400 prose-a:hover:text-blue-300 prose-pre:border prose-pre:border-gray-700 prose-pre:bg-gray-900"
       />
 
       <RelatedArticles :articles="relatedArticles" />

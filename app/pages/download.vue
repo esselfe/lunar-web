@@ -61,7 +61,7 @@
                prose-headings:tracking-tight prose-headings:text-white
                prose-h2:mt-14 prose-h2:text-2xl
                prose-p:text-gray-300 prose-li:text-gray-300 prose-li:marker:text-indigo-300/60
-               prose-a:text-indigo-300 prose-a:underline-offset-4 hover:prose-a:text-white
+               prose-a:text-indigo-300 prose-a:underline-offset-4 prose-a:hover:text-white
                prose-strong:text-white
                prose-code:rounded prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-normal prose-code:text-indigo-200
                prose-pre:border prose-pre:border-white/10 prose-pre:bg-gray-900
