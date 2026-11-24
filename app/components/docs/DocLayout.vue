@@ -37,14 +37,16 @@
       <slot name="sidebar" />
     </aside>
 
-    <div class="min-w-0 flex-1 px-4 py-12 sm:px-8">
+    <!-- Same padding as /docs, so the breadcrumb stays put going one level down -->
+    <div class="min-w-0 flex-1 px-6 pt-10 pb-24">
       <div class="mx-auto max-w-4xl">
         <slot />
       </div>
     </div>
 
-    <!-- Table of contents (wide screens only) -->
-    <aside class="sticky top-24 hidden max-h-[calc(100vh-7rem)] w-64 shrink-0 self-start overflow-y-auto xl:block">
+    <!-- Table of contents (wide screens only). As wide as the sidebar once the column has room
+         for its full width, so it's centred on the page and lines up with /docs -->
+    <aside class="sticky top-24 hidden max-h-[calc(100vh-7rem)] w-64 shrink-0 2xl:w-72 self-start overflow-y-auto xl:block">
       <slot name="toc" />
     </aside>
   </div>
