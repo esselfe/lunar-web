@@ -56,6 +56,11 @@ export default defineNuxtConfig({
         // homepage's structured data)
         { rel: 'apple-touch-icon', href: `${baseURL}apple-touch-icon.png` },
         { rel: 'alternate', type: 'application/rss+xml', title: 'Lunar Linux News', href: `${baseURL}rss.xml` }
+      ],
+      script: [
+        // Mark Apple devices before the first paint, so <ShortcutLabel> shows ⌘K instead of Ctrl K
+        // from the start rather than swapping the text (and the header's width) once the app starts.
+        { innerHTML: 'if(/Mac|iPhone|iPad/.test(navigator.platform))document.documentElement.dataset.platform=\'mac\'' }
       ]
     }
   },

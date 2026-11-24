@@ -32,6 +32,12 @@
   }
 }
 
+/* The search shortcut label (ShortcutLabel.vue): ⌘K on Apple devices, Ctrl K elsewhere. */
+:root[data-platform="mac"] .shortcut-other,
+:root:not([data-platform="mac"]) .shortcut-mac {
+  display: none;
+}
+
 /* Content overrides. Unlayered on purpose: Tailwind 4 puts typography (`prose`) in the utilities
    layer, which would beat anything in @layer components. */
 
