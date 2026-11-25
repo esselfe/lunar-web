@@ -303,10 +303,17 @@ useHead({
   }
 }
 
+/*
+ * The shockwave and the fragments wait at the impact point until the crash, so their first frame
+ * (held through the delay) is invisible; they appear on impact, behind the flash.
+ */
 @keyframes shockwave {
   0% {
-    opacity: 0.9;
+    opacity: 0.001;
     transform: scale(0.1);
+  }
+  2% {
+    opacity: 0.9;
   }
   100% {
     opacity: 0;
@@ -316,8 +323,11 @@ useHead({
 
 @keyframes debris {
   0% {
-    opacity: 1;
+    opacity: 0.001;
     transform: none;
+  }
+  2% {
+    opacity: 1;
   }
   60% {
     opacity: 0.9;
