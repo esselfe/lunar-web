@@ -38,19 +38,33 @@ has already written it down. Some good places to start:
 
 ### How should I partition my disk?
 
-The [installation guide](/docs/installation/installation-guide) covers the partitions every system
-needs (`/boot`, `/`). How you split up the rest depends on what the machine is for.
+Start with the partitions every Lunar system needs. Which ones depends on whether the computer
+boots in UEFI or BIOS (legacy) mode:
 
-**Desktops** usually have one disk that you partition once and then leave alone. The simplest setup
-is two main partitions:
+| Partition | UEFI | BIOS |
+| --- | --- | --- |
+| `/boot` | **Required:** about 512 MB, vfat, partition type "EFI System" | Optional but recommended: about 512 MB, ext4 |
+| BIOS boot | Not used | 1 MB, only on a GPT disk (GRUB needs it there); an MBR disk doesn't |
+| swap | A few GB | A few GB |
+| `/` | The rest, or see below | The rest, or see below |
+
+On UEFI, `/boot` has to be the EFI system partition: an ext4 `/boot` won't boot. If you want to
+hibernate, make swap at least as large as your RAM. The installer's `express_mkpart` creates this
+layout for you; the [installation guide](/docs/installation/installation-guide) walks through it.
+
+**Dual-booting with Windows?** Make `/boot`, the EFI system partition, at least 1 GB. Windows keeps
+its own boot files there too, and they take up a lot of room next to Lunar's kernels and initramfs
+images.
+
+How you split up the rest depends on what the machine is for.
+
+**Desktops** usually have one disk that you partition once and then leave alone. Next to `/boot`
+and swap, two partitions are enough:
 
 1. **`/`**: Lunar and all its software. Lunar takes 8 to 32 GB depending on how much you install,
    and the downloaded sources (`/var/spool/lunar`) and install caches (`/var/cache/lunar`) grow over
    time, so leave room. You can manage with less if you clean up often.
 2. **`/home`**: the rest of the disk.
-
-For swap, use a swapfile rather than a swap partition. A swapfile is easy to resize, move to another
-disk or delete later; a partition isn't.
 
 **Servers** need room to fail safely:
 
