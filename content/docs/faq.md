@@ -44,7 +44,7 @@ boots in UEFI or BIOS (legacy) mode:
 | Partition | UEFI | BIOS |
 | --- | --- | --- |
 | `/boot` | **Required:** about 512 MB, vfat, partition type "EFI System" | Optional but recommended: about 512 MB, ext4 |
-| BIOS boot | Not used | 1 MB, only on a GPT disk (GRUB needs it there); an MBR disk doesn't |
+| [BIOS boot partition](/docs/faq#what-is-a-bios-boot-partition) | Not needed | 1 MB, unformatted. Needed on a GPT disk, not on an MBR disk |
 | swap | A few GB | A few GB |
 | `/` | The rest, or see below | The rest, or see below |
 
@@ -71,6 +71,23 @@ and swap, two partitions are enough:
 - Put `/var/log` and `/var/tmp` on their own partitions, so runaway logs can't fill up `/`
 - Mount `/tmp` as tmpfs: it stays clean and is fast
 - Keep `/home` on its own partition too; it rarely needs to be large
+
+### What is a BIOS boot partition?
+
+A tiny partition where GRUB keeps its boot code on a BIOS (legacy) machine with a GPT disk.
+
+A BIOS only runs the first 512 bytes of the disk, and GRUB is much bigger than that, so it stores the
+rest of itself outside any filesystem:
+
+- **MBR disk:** in the unused gap between the first sector and the first partition. No extra
+  partition needed.
+- **GPT disk:** that gap holds the partition table, so GRUB needs a partition of its own: about 1 MB,
+  unformatted, with the partition type "BIOS boot". Without it, `grub-install` refuses to install.
+- **UEFI:** not used at all. The firmware loads GRUB as an ordinary file from the EFI system
+  partition (`/boot`).
+
+The BIOS boot partition is never formatted or mounted; GRUB writes to it directly. `express_mkpart`
+always creates a GPT disk, so in BIOS mode it adds one for you.
 
 ### Should kernel drivers be built in or modules?
 

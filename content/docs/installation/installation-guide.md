@@ -54,8 +54,9 @@ Choose **P** (Partition discs) and pick the disk. You can then use:
 layout depends on whether the computer booted the ISO in BIOS or UEFI mode (the installer detects
 this):
 
-- **BIOS:** a 1 MB BIOS boot partition (needed by GRUB on GPT), about 512 MB `/boot` (ext4), the rest
-  `/` (ext4), and a few GB of swap
+- **BIOS:** a 1 MB BIOS boot partition, about 512 MB `/boot` (ext4), the rest `/` (ext4), and a few
+  GB of swap. GRUB stores its boot code in the BIOS boot partition, which is never formatted or
+  mounted. It's needed on GPT disks only ([what it is](/docs/faq#what-is-a-bios-boot-partition))
 - **UEFI:** about 512 MB `/boot` (vfat, partition type "EFI System"), the rest `/` (ext4), and a few
   GB of swap. There is no BIOS boot partition
 
