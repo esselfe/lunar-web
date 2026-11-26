@@ -1,346 +1,328 @@
 ---
 title: "Frequently Asked Questions"
-description: "Common questions and answers about Lunar Linux, installation, optimization, and package management"
+description: "Short answers to common questions about Lunar Linux: installing, optimizing, adding and removing modules, and the penguin in the logo"
 category: "general"
 tags: ["faq", "help", "troubleshooting", "guide"]
-lastUpdated: 2026-11-21
+lastUpdated: 2026-11-26
 order: 1
+foldQuestions: true
 ---
 
-These are the Frequently Asked Questions for Lunar Linux. You have a question about Lunar? You might get your answer below.
+The questions that come up most often, answered briefly. If yours isn't here, ask in
+[#lunar on Libera.Chat](https://web.libera.chat/#lunar).
 
 ## General
 
 ### What is Lunar Linux?
 
-Please read the [About Lunar Linux](/about) page.
+A source-based Linux distribution: your machine compiles every program from the original source code,
+with the options you choose. The [About](/about) page has the whole picture.
 
-### Can I run Lunar Linux in 64-bit mode?
+### Is Lunar 64-bit?
 
-Yes you can. You can run Lunar Linux in either 64-bit or 32-bit mode, but there is no multi-lib toolchain. Be aware that some applications are still only available for 32-bit mode, such as older Windows games requiring the wine32 program (currently unavailable on 64-bit systems).
+Yes. Lunar runs on 64-bit PCs (x86_64), and the current ISOs are built for nothing else. The last
+32-bit (i686) release was 1.7.0, which is still on the [download page](/download).
 
-### Where can I find how to...?
+There is no multilib toolchain, so programs that need 32-bit libraries don't run on Lunar.
 
-The Lunar documentation only offers details specific to Lunar Linux. Many other resources already exist for general Linux problem solving.
+### Where do I find general Linux help?
 
-For example, information on how to customize the Linux kernel can be found at:
-- [https://kernelnewbies.org/](https://kernelnewbies.org/)
-- [https://en.wikipedia.org/wiki/Linux_kernel_mailing_list](https://en.wikipedia.org/wiki/Linux_kernel_mailing_list)
+The Lunar documentation covers what is specific to Lunar. For everything else, the wider Linux world
+has already written it down. Some good places to start:
 
-## Lunar Linux Installation
+- [The Arch Wiki](https://wiki.archlinux.org/): detailed and accurate for most programs, whatever the distribution
+- [The Linux kernel documentation](https://docs.kernel.org/): configuring and building kernels
+- [Kernel Newbies](https://kernelnewbies.org/): what changed in each kernel release
 
-### So how should I partition my disk?
+## Installing Lunar
 
-Server systems have very different demands than desktops. It's all about flexibility.
+### How should I partition my disk?
 
-#### Desktop Systems
+Start with the partitions every Lunar system needs. Which ones depends on whether the computer
+boots in UEFI or BIOS (legacy) mode:
 
-Desktops commonly have one hard disk. You don't want to reformat or repartition often, so you want to be done with it at once. The easiest setup is just two partitions:
+| Partition | UEFI | BIOS |
+| --- | --- | --- |
+| `/boot` | **Required:** about 512 MB, vfat, partition type "EFI System" | Optional but recommended: about 512 MB, ext4 |
+| [BIOS boot partition](/docs/faq#what-is-a-bios-boot-partition) | Not needed | 1 MB, unformatted. Needed on a GPT disk, not on an MBR disk |
+| swap | A few GB | A few GB |
+| `/` | The rest, or see below | The rest, or see below |
 
-1. **Root filesystem** - Big enough for all Lunar software (4-12 GB based on applications installed)
-2. **Home partition** - The rest of the disk for `/home`
+On UEFI, `/boot` has to be the EFI system partition: an ext4 `/boot` won't boot. If you want to
+hibernate, make swap at least as large as your RAM. The installer's `express_mkpart` creates this
+layout for you; the [installation guide](/docs/installation/installation-guide) walks through it.
 
-Typically, Lunar occupies between 8 and 32 GB based on how many applications you install. If you clean up often you can manage with 8GB, but you should keep some extra space.
+**Dual-booting with Windows?** Make `/boot`, the EFI system partition, at least 1 GB. Windows keeps
+its own boot files there too, and they take up a lot of room next to Lunar's kernels and initramfs
+images.
 
-**Swap recommendation:** Use a swapfile instead of a swap partition. You can always later delete the swap, or move the swapfile to another disk or partition. A swap partition is harder to relocate.
+How you split up the rest depends on what the machine is for.
 
-#### Server Systems
+**Desktops** usually have one disk that you partition once and then leave alone. Next to `/boot`
+and swap, two partitions are enough:
 
-Servers have different needs:
-- `/home` doesn't need to be that large
-- Setup space for logfiles that cannot cause problems if they grow too fast
-- Putting `/var/tmp` and `/var/log` on separate partitions is quite normal
-- `/tmp` can be abused similarly, and is mostly run in tmpfs to avoid cluttering and give fast access times
-- `/usr` will be separate and the usual separate rootfs
-- Most users will want to make the rootfs quite small (as small as 200MB sometimes!)
-- `/home` also needs to be on a separate partition
+1. **`/`**: Lunar and all its software. Lunar takes 8 to 32 GB depending on how much you install,
+   and the downloaded sources (`/var/spool/lunar`) and install caches (`/var/cache/lunar`) grow over
+   time, so leave room. You can manage with less if you clean up often.
+2. **`/home`**: the rest of the disk.
 
-### Kernel features: built-in or module?
+**Servers** need room to fail safely:
 
-When compiling a kernel, should I compile drivers as built-in or as modules?
+- Put `/var/log` and `/var/tmp` on their own partitions, so runaway logs can't fill up `/`
+- Mount `/tmp` as tmpfs: it stays clean and is fast
+- Keep `/home` on its own partition too; it rarely needs to be large
 
-There are many schools of thought on kernel compiling. Here is a suggestion: **If it's not needed to boot, it's a module.**
+### What is a BIOS boot partition?
 
-Thus USB, input, sound, mice, ACPI, network, CD-ROM, floppy, and all non-boot file systems all get built as modules. This reduces the size of the main kernel so it can be put on a floppy.
+A tiny partition where GRUB keeps its boot code on a BIOS (legacy) machine with a GPT disk.
 
-Another consideration is that not everything works perfectly, and some features can cause your kernel to misbehave. If a feature is built-in, the bad behavior is practically inevitable. With a module, you can choose not to load it and thus be left with a working system.
+A BIOS only runs the first 512 bytes of the disk, and GRUB is much bigger than that, so it stores the
+rest of itself outside any filesystem:
 
-**Note:** Some people need to make some features built into their kernel and vice versa. Do whatever works best for you.
+- **MBR disk:** in the unused gap between the first sector and the first partition. No extra
+  partition needed.
+- **GPT disk:** that gap holds the partition table, so GRUB needs a partition of its own: about 1 MB,
+  unformatted, with the partition type "BIOS boot". Without it, `grub-install` refuses to install.
+- **UEFI:** not used at all. The firmware loads GRUB as an ordinary file from the EFI system
+  partition (`/boot`).
 
-### QEMU and Lunar ISO testing
+The BIOS boot partition is never formatted or mounted; GRUB writes to it directly. `express_mkpart`
+always creates a GPT disk, so in BIOS mode it adds one for you.
 
-A very simple way to test a Lunar ISO for booting purposes is:
+### Should kernel drivers be built in or modules?
+
+There are many schools of thought. A good rule: **if it isn't needed to boot, make it a module.**
+
+USB, input, sound, ACPI, network and every filesystem you don't boot from can all be modules. That
+keeps the kernel small, and it is safer: if a driver misbehaves, you can leave its module unloaded and
+still have a working system. A built-in driver always loads.
+
+Some setups need things the other way around. Do whatever works for your machine.
+
+### How do I test a Lunar ISO in QEMU?
+
+To check that an ISO boots:
 
 ```bash
-qemu -cdrom lunar-1.8.0-daily-[YYYYMMDD]-x86_64.iso -boot d
+qemu-system-x86_64 -enable-kvm -m 2048 -cdrom lunar-1.8.0-daily-YYYYMMDD-x86_64.iso -boot d
 ```
 
-If you want to test a full install, create a 20 gigabyte QCOW2 disk image used as rootfs:
+To test a full install, create a 20 GB disk image:
 
 ```bash
-qemu-img create -f qcow2 Lunar.qcow2 20G
+qemu-img create -f qcow2 lunar.qcow2 20G
 ```
 
-Now invoke qemu for the installation:
+Boot the installer with the disk attached:
 
 ```bash
-qemu-system-x86_64 -vga std -enable-kvm -m 2048 -cpu 2 \
-  -drive file=Lunar.qcow2,format=qcow2,if=virtio \
-  -cdrom file=lunar-1.8.0-daily-[YYYYMMDD]-x86_64.iso,if=virtio \
-  -boot d
+qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -vga std \
+  -drive file=lunar.qcow2,format=qcow2,if=virtio \
+  -cdrom lunar-1.8.0-daily-YYYYMMDD-x86_64.iso -boot d
 ```
 
-After powering off the VM, run qemu with the new system:
+After the install, power off the VM and start the new system from the disk:
 
 ```bash
-qemu-system-x86_64 -vga std -enable-kvm -m 2048 -cpu 2 -nic user \
-  -drive file=Lunar.qcow2,format=qcow2,if=virtio
+qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -vga std -nic user \
+  -drive file=lunar.qcow2,format=qcow2,if=virtio
 ```
 
-You can then proceed to test your Lunar install. QEMU can also be quite easily used to test if your brand new kernel is bootable or not, which is quite neat.
+QEMU is just as handy for checking that a freshly built kernel boots.
 
-**Note:** You should say yes to using SDL as an optional_depends. The GUI version of QEMU is very nice in its own little X11 window.
+When you `lin qemu`, say yes to the SDL2 or GTK 3 optional dependency, so the VM gets its own window.
 
 ## Optimizations
 
 ### How do I set optimizations?
 
-Run `lunar optimize`. You'll be taken through an interactive menu that explains all the options. Remember to optimize safely.
+Run `lunar optimize`. Pick a component (the GNU C Compiler, the GNU linker, the compiler cache) and
+you get a menu where every option has a short explanation.
+
+Leave **optimization safety** on (it is on by default). It hides the settings that are known to break
+builds.
 
 ### What are safe optimizations?
 
-The default sure-fire optimizations that are recommended are:
+The defaults. They work for almost everyone:
 
-**C/C++:**
-- `-pipe`
+| Menu                         | Setting                                                                            |
+|------------------------------|------------------------------------------------------------------------------------|
+| Base speed optimization      | **Faster** (`-O2`)                                                                 |
+| CPU base arch selection      | **x86-64** to run the system on any 64-bit PC, or **native** for this machine only |
+| CPU extensions               | None                                                                               |
+| Specialized optimizations    | The defaults: `-fno-plt`, `-fexceptions`                                           |
+| Floating point optimizations | None                                                                               |
+| General C/C++ options        | The defaults: `-pipe`, fortify, stack clash protection                             |
+| GNU linker                   | **Strip** on (turn it off when you need debug symbols for a problem module)        |
+| Compiler cache               | ccache on                                                                          |
 
-**CPU Architecture:**
-- You should pick the correct architecture for your own system (defaults to x86-64 for most people)
+**native** (`-march=native`) turns on every extension your CPU has (SSE4, AVX and so on), so you don't
+need to pick them under CPU extensions. A system built that way may not run on an older or different
+CPU.
 
-**Basic Optimizations:**
-- Faster (`-O2`, the default)
-
-**CPU:**
-- This should be set to your own CPU, or the CPU of the machine you plan to run this install on
-- The "native" option turns on all the CPU features in addition to the default generic x86-64 target, such as SSE2, SSSE3, SSE4_\*, SIMD, AVX, etc.
-- If you want to run this install on many machines, you should be safe with x86-64
-
-**Speed Optimizations:**
-- If you want to be 100% sure that there won't be optimization problems, you shouldn't select any of these
-
-**Extra features:**
-- Not recommended to use any of these optimizations, even for modules known to be able to handle them, since they cause many apps to break
-
-**Floating Point Math:**
-- None
-
-**Linker Options:**
-- Strip (Turn this off if you want debug symbols with a problematic module)
-
-**Addon Program Support:**
-- CCache
-
-These settings should work for almost everyone, and there is room for pushing these optimizations more, at the risk of problems with some applications. Read `info gcc` and make sure you understand a given optimization before you enable it.
-
-### What optimizations may cause problems?
-
-Some optimizations that are known to cause problems on x86 with many applications:
-
-- `-funroll-loops`
-- `-fstrict-aliasing`
-- `-ffast-math`
-- `-ffloat-store`
-
-These are sorted from the least unstable to most unstable. Read `info gcc` and make sure you understand a given optimization before you enable it.
+There is room to push further, at the risk of breaking some modules. Read `info gcc` and make sure you
+understand an optimization before you turn it on.
 
 ### What optimizations can give some speed without issues?
 
-Start with the basic optimizations and change the Basic Optimizations to Faster or Fastest if you know that GCC will generate correct code for that CPU:
-- `-O2` obviously takes more compile time than `-O1`
-- `-O3` takes the most time to compile
+With safety on, everything under **Specialized optimizations** is taken from what GCC already
+does at `-O2`, so it is safe to experiment with. `-fomit-frame-pointer` (Pointers) is a reasonable
+first pick.
 
-Then select the CPU you will run it on. Some speed optimizations that should be decent and shouldn't cause too many problems: `-fomit-frame-pointer`
+**Fastest** (`-O3`) needs safety off. It compiles more slowly and doesn't always produce faster code.
 
-Check `cat /proc/cpuinfo` to see if your CPU supports SSE or SSE2. If your CPU does have SSE or SSE2, you can also add that to the math optimizations.
+### What optimizations cause problems?
 
-Your results may vary. Read `info gcc` and make sure you understand a given optimization before you enable it.
+These only appear with safety off, and they are known to break many modules:
 
-### What optimizations should I avoid?
+- `-funroll-loops` (Speedy)
+- `-ffast-math` (Risky): breaks the IEEE floating point rules that many programs rely on
+- `-ffloat-store` (Float)
 
-All the ones listed in "What optimizations may cause problems?" plus:
+Avoid `-fprofile-arcs` (Profiling) and `-fbranch-probabilities` (Branching) altogether. They are two
+halves of profile-guided optimization, and a normal `lin` never produces the profile they need.
 
-- `-fprofile-arcs`
-- `-fbranching-probabilities`
+Before you report a failed build, turn safety back on and try again: reports from builds with risky
+optimizations won't be followed up.
 
-Please read `info gcc` and make sure you understand a given optimization before you enable it. The Lunar developers will not respond to bug reports of broken compiles by users with risky optimizations.
-
-## Installing Modules
+## Installing modules
 
 ### Can I compile several modules at once?
 
-Yes, Lunar even promotes it. However, doing so will cause installs to compile slower. Lunar will not install core system modules like GCC and glibc while something else is installing and will wait until the rest is finished. Also, you cannot install applications while those major modules are installing - they will wait their turn until it's safe and continue to install them automatically.
+Yes, and Lunar is built for it, though each build runs slower when they share the CPU. Lunar won't
+install core modules like `gcc` or `glibc` while anything else is installing: it waits until the rest
+has finished, and other modules wait while one of those is installing. They all continue automatically.
 
-### error: download failed - broken URL
+### Download failed: broken URL
 
-There are three possible reasons why the download failed:
+There are three likely reasons.
 
-**1. Mirror is busy or incomplete:**
-- You are trying to download from one of a set of mirror sites, and the mirror you are using is either busy or incomplete
-- Run `lunar` as root, select Options / Software Mirrors, and change the mirror to something closer to you
-- Note: There seems to be a consistent problem with the SFORGE mirror: `http://osdn.dl.sourceforge.net`
+**1. The mirror is busy or incomplete.** Run `lunar` as root, open **Options › Software Mirrors**, and
+pick a mirror closer to you.
 
-**2. File location has changed:**
-- You are trying to download from a particular site, but the location of the file has changed (or the site is temporarily off-line)
-- Browse the module's website (see `lvu website`) or search the web for the tarball
-- Download it manually, copy it to `/var/spool/lunar`, and try to run `lin` again
-- Run `lvu edit` to create a zlocal copy, and edit that copy with the new location or secondary URL
+**2. The file has moved**, or the site is temporarily offline.
 
-**3. Version has been removed:**
-- You are trying to download a version that has been removed because a newer version exists
-- Browse the module's website to discover the new version number
-- Run `lvu edit` to create a zlocal copy, and edit that copy with the new location, version number, sha256sum, etc.
-- Note: You could first try to run `lin -w newVersion` and hope that it builds without problems
+- Find the tarball on the module's website (`lvu website MODULE`) or search the web for it
+- Download it yourself, copy it to `/var/spool/lunar`, and run `lin` again
+- Or run `lvu edit MODULE` to make a `zlocal` copy of the module, and give it the new location or a
+  second URL
 
-If you do create your own zlocal copy, please consider submitting it on Github as a new pull request (PR). (See [Module Submission](/docs/development/module-submission))
+**3. The version was removed** because a newer one came out.
 
-### error: C compiler cannot create executables
+- Check the module's website for the new version number
+- Try `lin -w NEW_VERSION MODULE` first; with luck it builds as is
+- Otherwise run `lvu edit MODULE` and update the version, location and sha256sum in the `zlocal` copy
 
-What does this error mean and how can I fix it?
+If you make a `zlocal` copy that works, please send it to us as a pull request on GitHub. See
+[Module Submission](/docs/development/module-submission).
 
-This is basically the same problem as the C preprocessor error below: There are libraries missing that are vital to the compilation.
+### configure: error: C compiler cannot create executables
 
-One of them found in `/usr/src/$MODULE-$VERSION/config.log` is:
-`ccache: error while loading shared libraries: libfmt.so.10: cannot open shared`
+The compiler is missing a library it needs. Look in `/usr/src/MODULE-VERSION/config.log` for the
+library that fails to load. Two known cases:
 
-This means that ccache needs to be disabled in the 'lunar optimize' menu, and the ccache module needs to be rebuilt. Then re-enable ccache and try the module that failed again.
+**ccache can't load a library**, for example:
 
-Another one found in config.log, is when gcc is built with the isl feature, then isl is updated with the shared library being renamed:
-`cc1: error while loading shared libraries: libisl.so.XX: cannot open shared object file: No such file or directory`
+```
+ccache: error while loading shared libraries: libfmt.so.10: cannot open shared object file
+```
 
-You have to revert and resurrect the previous isl version first, then rebuild gcc without isl, go back to the current isl, then finally rebuild gcc with isl.
+Turn ccache off in `lunar optimize`, rebuild it with `lin -c ccache`, turn it back on, and try the
+module that failed again.
+
+**gcc can't load an updated isl**, for example:
+
+```
+cc1: error while loading shared libraries: libisl.so.XX: cannot open shared object file: No such file or directory
+```
+
+This happens when gcc was built with isl support and isl then got a new library version. Go back to
+the previous isl version, rebuild gcc without isl, update isl again, and finally rebuild gcc with isl.
 
 ### configure: error: C preprocessor "/lib/cpp" fails sanity check
 
-This is an include file problem. Sometimes `/usr/include/gnu/stubs.h` is missing - this can be found in the glibc source tarball. Most of the time the following applies:
-
-Your kernel headers are missing from `/usr/include`. This means the C PreProcessor cannot verify that it has the proper cached copies of those vital header files. You need to install the proper ones manually.
-
-**Try this first:**
+A header file is missing. Usually it is the kernel headers in `/usr/include`. Reinstall them:
 
 ```bash
 lin kernel-headers
 ```
 
-**If that doesn't work:**
-
-Create the target directories:
+If that doesn't help, you can install them from a kernel source tree yourself:
 
 ```bash
-mkdir -p /usr/include/{linux,asm}
+cd /usr/src/linux
+make headers_install INSTALL_HDR_PATH=/usr
 ```
 
-Then copy the files manually:
+Less often, `/usr/include/gnu/stubs.h` is missing. It belongs to glibc, and `lin -c glibc` puts it
+back.
 
-```bash
-cp -av /usr/src/linux/include/linux /usr/include/
-cp -av /usr/src/linux/include/asm/* /usr/include/asm/
-```
+### How do I add a window manager to the login screen?
 
-**Warning:** The second command has to be done this way since `/usr/src/linux/include/asm` is a softlink to your arch asm header files (asm points to asm-i386 on x86 machines). If you had copied:
+Display managers like GDM, SDDM and LightDM list the sessions they find in `/usr/share/xsessions/`
+(X11) and `/usr/share/wayland-sessions/` (Wayland). Most window manager modules install a `.desktop`
+file there. If yours doesn't, write one, or copy it from the window manager's source.
 
-```bash
-cp -av /usr/src/linux/include/asm /usr/include/
-```
-
-You would then get a softlink to nowhere under `/usr/include/`.
-
-Last, you can always try to unpack the kernel tarball you have into `/usr/src/linux` and manually link or copy the headers over yourself.
-
-### Can I add more window managers to gdm?
-
-Copy the desktop startup files to `/etc/X11/dm/Sessions/`. That works with gdm. For kdm you will have to copy them to `$KDE_PREFIX/share/apps/kdm/sessions`.
-
-## Removing Modules
+## Removing modules
 
 ### How do I remove a module?
 
-If you have just installed a module for the first time using `lin`, then it is usually safe to remove it using `lrm`.
+If you have just installed a module for the first time with `lin`, it is usually safe to remove it
+with `lrm`.
 
-However, if you have built or rebuilt other modules that depend on it, you will need to be careful:
-- Use `lvu eert` to identify these modules
-- Remove them too, or rebuild them using `lin -rc` to change the optional dependency
-- Run `lunar nofix` to make sure that some hidden dependency has not been affected
+If you have since built modules that depend on it, be careful:
 
-You can also use `lrm -p` to purge all modules that depend on it, but this is not recommended in general because it is easy to break your system.
+- `lvu eert MODULE` shows the tree of modules that depend on it
+- Remove those too, or rebuild them with `lin -rc` and choose different optional dependencies
+- Run `lunar nofix` afterwards to check that no hidden dependency broke
 
-### How do I safely remove an optional module?
+`lrm -p` removes the module along with everything that depends on it. That is rarely what you want,
+and it is an easy way to break your system.
 
-There are three ways, ranging from "time-consuming but safe" to "possibly quick but dangerous":
+### How do I safely remove an optional dependency?
 
-**Method 1: Using lvu eert**
+There are three ways, from safe but slow to quick but risky.
 
-Use the `lvu eert` approach described above.
+**1. By hand:** follow the steps above, starting from `lvu eert`.
 
-**Method 2a: Rebuild depending modules**
-
-You can use `lsh` to access the Lunar internal functions to find other modules that have a known dependency on theModule and rebuild them. If you `lrm` theModule first, the rebuilds and `lunar fix` cannot silently reuse the module again.
+**2. Rebuild everything that depends on it.** `lsh` gives you Lunar's internal functions. Remove the
+module first, so the rebuilds and `lunar fix` can't quietly pick it up again, then rebuild its
+dependents in dependency order:
 
 ```bash
-for i in `lsh list_installed_depending theModule`; do lin -cr "$i"; done
+lrm MODULE
+DEPENDENTS=$(lsh list_installed_depending MODULE | sort -u)
+lin -cr $(lsh sort_by_dependency $DEPENDENTS)
 lunar fixdepends
 lunar fix
 ```
 
-**Method 2b: Rebuild in dependency order**
+**3. Quick and risky:** `lrm MODULE`, then `lunar nofix` to find what broke, and `lin -cr` each module
+it reports. Repeat until `lunar nofix` is quiet.
 
-If you want to rebuild the modules in dependency order, you will need to do a bit more work:
+## Lunar core tools
 
-```bash
-MODULES=""
-for i in `lsh list_installed_depending theModule`
-do
- VAR=$(echo "$MODULES" | grep "$i")
- if [ -z "$VAR" ]
- then
-  MODULES="$MODULES $i"
- fi
-done
-lin -cr "$MODULES"
-lunar fixdepends
-lunar fix
-```
-
-**Method 3: Quick but potentially dangerous**
-
-Run `lrm theModule`. Use `lunar nofix` to identify problems. Run `lin -cr` for each problem. Rinse and repeat.
-
-## Lunar Core Tools
-
-### How can I recompile my module with new options?
-
-Try:
+### How do I rebuild a module with new options?
 
 ```bash
 lin -r MODULE
 ```
 
-The `-r` switch will allow you to select new configuration and dependencies for modules.
+`-r` asks the configuration questions and optional dependencies again.
 
-### How can I make modules recompile instead of resurrecting?
-
-Try doing:
+### How do I make a module compile instead of resurrecting?
 
 ```bash
 lin -c MODULE
 ```
 
-The `-c` option tells `lin` to compile this module even if there is an install cache copy available in `/var/cache/lunar`.
+`-c` compiles the module even if there is an install cache of it in `/var/cache/lunar`.
 
-### How can I tell Lunar that module X no longer depends on module Y?
+### Module X no longer depends on module Y. How do I tell Lunar?
 
-Module X no longer depends on module Y, but Lunar insists on reinstalling module Y too. How can I tell Lunar to remove that dependency?
-
-Lunar adds a module's dependencies to a cache when you install it. You can't remove a dependency automatically, but you can rebuild the dependency cache to reflect the current dependencies of the modules that are now installed:
+Lunar records a module's dependencies when you install it, so it may keep pulling in Y. You can't
+remove a single dependency, but you can rebuild the dependency cache from the modules installed now:
 
 ```bash
 lsh create_module_index
@@ -348,67 +330,69 @@ lsh create_depends_cache
 lunar fixdepends
 ```
 
-**Note:** Dependencies of modules in zlocal are ignored. If module X in the main moonbase depends on module Y, then the dependency cache will still contain that dependency.
+Dependencies of modules in `zlocal` are ignored: if X in the main moonbase depends on Y, the cache keeps
+that dependency.
 
 ### My moonbase is gone and I can't install anything
-
-How do I fix problems with my moonbase when it's missing or damaged?
-
-Simple solution:
 
 ```bash
 lin moonbase
 ```
 
-This will download the latest moonbase from the internet and restore it to working order.
+This downloads the latest moonbase and puts it back in working order.
 
 ### What is a module?
 
-A module is a set of files that tell the core tools the following:
+A module is a small set of bash scripts and files that tell the core tools:
 
-- What name, version, and other properties a package has
-- Where to download all needed source files
-- What other modules are required, or conflict with this one
-- How to unpack the source files, how to patch
-- How to configure the code
-- How to compile
-- How to install everything
-- What else to do with it
+- the package's name, version and other properties
+- where to download its sources
+- which other modules it needs or conflicts with
+- how to unpack and patch the sources
+- how to configure, compile and install them
+- what else to do afterwards
 
-The module is coded in a set of files in a directory structure, and scripted in bash.
+See [Module Basics](/docs/development/module-basics) to read or write one.
 
-### What is the Moonbase?
+### What is the moonbase?
 
-The Moonbase is a filesystem-based database with modules. In this database there are descriptions of packages that tell the core tools where to download, how to compile, and how to install a module. You can consider this the Lunar equivalent of portage, grimoire, ports, etc.
-
-See [Moonbase](/docs/package-management/moonbase) for more details.
+The collection of every module Lunar offers, kept as plain directories and files. It's the Lunar
+equivalent of Gentoo's portage or the BSD ports tree. See [Moonbase](/docs/package-management/moonbase),
+or look around in the [module browser](/modules).
 
 ## Other
 
-### How do I unpack an .RPM file in Lunar?
+### How do I unpack an .rpm file?
 
-The easiest way to unpack an RPM file is to use the module called `rpmunpack`. Simply run:
+Install the `rpmunpack` module and run:
 
 ```bash
 rpmunpack XYZ.rpm
 ```
 
-This will create a cpio file (XYZ.cpio.gz and XYZ.cpio.bz2 are not uncommon). Once you perform any additional uncompression with `gunzip` or `bunzip2`, you can then extract it using:
+This gives you a cpio archive (sometimes compressed, as `XYZ.cpio.gz` or `XYZ.cpio.bz2`; unpack those
+with `gunzip` or `bunzip2` first). Then extract it:
 
 ```bash
 cpio -i -d < XYZ.cpio
 ```
 
-If you are trying to rpmunpack a source RPM (i.e., .src.rpm) file, then XYZ.cpio may further contain a tar.bz2 or tar.gz source tarball.
+A source RPM (`.src.rpm`) usually contains a source tarball as well. `man cpio` lists more options,
+such as `-L`.
 
-You might want to do `man cpio` to check out additional cpio parameters that may interest you, such as the `-L` switch.
+### What is in the Lunar Linux logo?
 
-### What is that in the Lunar Linux logo?
+A [rockhopper penguin](https://en.wikipedia.org/wiki/Southern_rockhopper_penguin). Lunar started out
+as Lunar Penguin (the [history](/history) page tells the story), and the penguin stayed when the name
+changed.
 
-The logo is a [Rockhopper Penguin](http://en.wikipedia.org/wiki/Southern_Rockhopper_Penguin). It's a kind of nasty penguin that crowds up in thousands to take over the continent. They have a few long feathers sticking out at their "ears" sideways, just like some owl species do.
+Rockhoppers are among the smallest crested penguins, about 50 cm tall, with red eyes and a spiky
+crest of yellow feathers that sticks out sideways above each eye. They are named for the way they get
+around: instead of waddling or sliding on their bellies, they jump from rock to rock with both feet
+together, up steep and wave-battered shores. They breed in large, noisy colonies on islands in the
+Southern Ocean, and they are famously bold for their size. A fitting mascot for a distribution you
+build yourself, one module at a time.
 
-You can check out [Google Images](http://images.google.com/images?q=Rockhopper+Penguin) for lots of Rockhopper Penguin pictures!
-
-The previous logo was designed by Michael Schindler in 2003 and appeared as the official logo of the Lunar Linux project in 2004-2024.
-
-The current logo was designed by tbeckerson in 2022 and appears as the current logo mostly everywhere except distrowatch.com.
+Michael Schindler designed the first logo in 2003, and it was the official logo from 2004 to 2024. The
+current logo was designed by tbeckerson in 2022 and is used almost everywhere now; DistroWatch still
+shows the old one.

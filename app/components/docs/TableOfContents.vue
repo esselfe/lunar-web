@@ -102,6 +102,7 @@ const scrollToHeading = (id: string) => {
   const heading = document.getElementById(id)
   if (!heading) return
 
+  heading.closest('details')?.setAttribute('open', '') // a folded FAQ question
   activeId.value = id
   isScrolling = true
   heading.scrollIntoView({ behavior: 'smooth', block: 'start' }) // offset comes from scroll-margin-top

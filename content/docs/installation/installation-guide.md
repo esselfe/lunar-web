@@ -3,7 +3,7 @@ title: "Installation Guide"
 description: "Step-by-step guide to installing Lunar Linux from the daily ISO"
 category: "installation"
 order: 2
-lastUpdated: 2026-11-22
+lastUpdated: 2026-11-26
 tags: [installation, guide, setup]
 relatedDocs: [requirements]
 ---
@@ -54,8 +54,9 @@ Choose **P** (Partition discs) and pick the disk. You can then use:
 layout depends on whether the computer booted the ISO in BIOS or UEFI mode (the installer detects
 this):
 
-- **BIOS:** a 1 MB BIOS boot partition (needed by GRUB on GPT), about 512 MB `/boot` (ext4), the rest
-  `/` (ext4), and a few GB of swap
+- **BIOS:** a 1 MB BIOS boot partition, about 512 MB `/boot` (ext4), the rest `/` (ext4), and a few
+  GB of swap. GRUB stores its boot code in the BIOS boot partition, which is never formatted or
+  mounted. It's needed on GPT disks only ([what it is](/docs/faq#what-is-a-bios-boot-partition))
 - **UEFI:** about 512 MB `/boot` (vfat, partition type "EFI System"), the rest `/` (ext4), and a few
   GB of swap. There is no BIOS boot partition
 
@@ -63,6 +64,10 @@ If you partition by hand, use **M** (Select target partitions) to say where each
 and which filesystem it gets. **W** sets up Linux software RAID, and **S** adds a swapfile. For UEFI,
 `/boot` must be the EFI system partition: formatted vfat and with the partition type "EFI System"
 (in `cfdisk` or `fdisk`). An ext4 `/boot` will not boot.
+
+**Dual-booting with Windows?** Make `/boot`, the EFI system partition, at least 1 GB. Windows keeps
+its own boot files there too, and they take up a lot of room next to Lunar's kernels and initramfs
+images. Partition by hand: `express_mkpart` erases the whole disk, Windows included.
 
 ## 4. Boot Loader
 
