@@ -5,6 +5,7 @@ category: "general"
 tags: ["faq", "help", "troubleshooting", "guide"]
 lastUpdated: 2026-11-26
 order: 1
+foldQuestions: true
 ---
 
 The questions that come up most often, answered briefly. If yours isn't here, ask in

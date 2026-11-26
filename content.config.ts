@@ -11,6 +11,7 @@ export default defineContentConfig({
         lastUpdated: z.date().optional(),
         order: z.number().optional(),
         archived: z.boolean().default(false),
+        foldQuestions: z.boolean().default(false),
         seeAlso: z.array(z.object({
           title: z.string(),
           path: z.string()

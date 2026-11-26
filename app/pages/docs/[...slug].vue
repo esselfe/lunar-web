@@ -33,16 +33,27 @@
         >
           {{ page.description }}
         </p>
-        <p
-          v-if="page.lastUpdated"
-          class="mt-4 text-sm text-gray-450"
+        <div
+          v-if="page.lastUpdated || page.foldQuestions"
+          class="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
+          :class="{ 'min-h-7': page.foldQuestions }"
         >
-          Last updated: {{ formatDate(page.lastUpdated) }}
-        </p>
+          <p
+            v-if="page.lastUpdated"
+            class="text-sm text-gray-450"
+          >
+            Last updated: {{ formatDate(page.lastUpdated) }}
+          </p>
+          <FoldAllToggle
+            v-if="page.foldQuestions"
+            class="-mr-2 ml-auto"
+          />
+        </div>
       </header>
 
       <ContentRenderer
-        :value="page"
+        :value="rendered"
+        :components="foldComponents"
         class="prose max-w-none prose-invert prose-a:text-blue-400 prose-a:hover:text-blue-300 prose-pre:border prose-pre:border-gray-700 prose-pre:bg-gray-900"
       />
 
@@ -82,6 +93,7 @@
 
 <script setup lang="ts">
 import { withoutTrailingSlash } from 'ufo'
+import FoldQuestion from '~/components/content/FoldQuestion.vue'
 import type { RelatedDoc } from '~/components/docs/RelatedArticles.vue'
 import type { DocNavItem } from '~/composables/useDocsNavigation'
 
@@ -97,6 +109,14 @@ if (!data.value) {
 }
 
 const page = computed(() => data.value!)
+
+// Pages with `foldQuestions: true` (the FAQ) show each `###` question as a fold-out.
+const rendered = computed(() => page.value.foldQuestions
+  ? { ...page.value, body: foldQuestions(page.value.body) }
+  : page.value)
+// Named here because no markdown file mentions <FoldQuestion>: production builds only bundle the
+// content components that markdown uses, so it wouldn't be found otherwise.
+const foldComponents = { 'fold-question': FoldQuestion }
 
 // Lights up this page on the flight plan (/docs), in this browser only
 const { markVisited } = useVisitedDocs()
